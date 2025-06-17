@@ -4,7 +4,8 @@
   "description": "This repository contains a set of community-generated functions, to serve as examples to base your own functions upon. If you're building out a new integration, or a custom piece of code that you want Segment to run, use this repo as the set of examples.",
   "main": "index.js",
   "scripts": {
-    "test": "jest --verbose"
+    "test": "jest --verbose",
+    "format": "biome format --write"
   },
   "repository": {
     "type": "git",
@@ -28,7 +29,9 @@
     "xml": "1.0.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.0.0",
     "jest": "^24.9.0",
     "nock": "^11.3.5"
-  }
+  },
+  "packageManager": "pnpm@10.12.1+sha512.f0dda8580f0ee9481c5c79a1d927b9164f2c478e90992ad268bbb2465a736984391d6333d2c327913578b2804af33474ca554ba29c04a8b13060a717675ae3ac"
 }
