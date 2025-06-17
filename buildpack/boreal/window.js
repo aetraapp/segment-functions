@@ -7,7 +7,7 @@
 const { URL, URLSearchParams } = require('url');
 const fetch = require('node-fetch');
 const { Request, Response, Headers } = fetch;
-const _ = require("lodash");
+const _ = require('lodash');
 const { merge } = _;
 
 const _url = Symbol('url');
@@ -29,19 +29,23 @@ class ServerRequest {
       this[_url] = url instanceof URL ? url : new URL(url);
     }
     switch (typeof input) {
-    case 'object':
-      this[_body] = { json: input };
-      break;
-    case 'string':
-      this[_body] = { text: input };
-      break;
-    default:
-      throw new TypeError("unsupported body type")
+      case 'object':
+        this[_body] = { json: input };
+        break;
+      case 'string':
+        this[_body] = { text: input };
+        break;
+      default:
+        throw new TypeError('unsupported body type');
     }
   }
 
-  get url() { return this[_url]; }
-  get headers() { return this[_headers]; }
+  get url() {
+    return this[_url];
+  }
+  get headers() {
+    return this[_headers];
+  }
 
   json() {
     const body = this[_body];
@@ -87,137 +91,137 @@ const Segment = {
 
   set(d) {
     // TODO: Stricter validation for collection, id, and properties - see spec
-    assertExists(d, "collection")
-    assertExists(d, "id")
+    assertExists(d, 'collection');
+    assertExists(d, 'id');
     setObject = {
       collection: d.collection,
       id: d.id,
-    }
-    setAttribute(setObject, "properties", d.properties)
-    this.objects.push(setObject)
-    return setObject
+    };
+    setAttribute(setObject, 'properties', d.properties);
+    this.objects.push(setObject);
+    return setObject;
   },
 
   // https://segment.com/docs/spec/identify/
-  identify(d){
+  identify(d) {
     partialObj = {
-      type: "identify"
-    }
-    setAttribute(partialObj, "traits", d.traits)
-    obj = merge(partialObj, common(d))
-    this.events.push(obj)
-    return obj
+      type: 'identify',
+    };
+    setAttribute(partialObj, 'traits', d.traits);
+    obj = merge(partialObj, common(d));
+    this.events.push(obj);
+    return obj;
   },
 
   // https://segment.com/docs/spec/track/
   track(d) {
-    assertExists(d, "event")
+    assertExists(d, 'event');
 
     partialObj = {
-      type: "track",
+      type: 'track',
       event: d.event,
-    }
-    setAttribute(partialObj, "properties", d.properties)
-    obj = merge(partialObj, common(d))
-    this.events.push(obj)
-    return obj
+    };
+    setAttribute(partialObj, 'properties', d.properties);
+    obj = merge(partialObj, common(d));
+    this.events.push(obj);
+    return obj;
   },
 
   // https://segment.com/docs/spec/page/
   page(d) {
     partialObj = {
-      type: "page",
-    }
-    setAttribute(partialObj, "name", d.name)
-    setAttribute(partialObj, "properties", d.properties)
-    obj = merge(partialObj, common(d))
-    this.events.push(obj)
-    return obj
+      type: 'page',
+    };
+    setAttribute(partialObj, 'name', d.name);
+    setAttribute(partialObj, 'properties', d.properties);
+    obj = merge(partialObj, common(d));
+    this.events.push(obj);
+    return obj;
   },
 
   // https://segment.com/docs/spec/screen/
   screen(d) {
     partialObj = {
-      type: "screen",
-    }
-    setAttribute(partialObj, "name", d.name)
-    setAttribute(partialObj, "properties", d.properties)
-    obj = merge(partialObj, common(d))
-    this.events.push(obj)
-    return obj
+      type: 'screen',
+    };
+    setAttribute(partialObj, 'name', d.name);
+    setAttribute(partialObj, 'properties', d.properties);
+    obj = merge(partialObj, common(d));
+    this.events.push(obj);
+    return obj;
   },
 
   // https://segment.com/docs/spec/group/
   group(d) {
-    assertExists(d, "groupId")
+    assertExists(d, 'groupId');
     partialObj = {
-      type: "group",
-      groupId: d.groupId
-    }
-    setAttribute(partialObj, "traits", d.traits)
-    obj = merge(partialObj, common(d))
-    this.events.push(obj)
-    return obj
+      type: 'group',
+      groupId: d.groupId,
+    };
+    setAttribute(partialObj, 'traits', d.traits);
+    obj = merge(partialObj, common(d));
+    this.events.push(obj);
+    return obj;
   },
 
   // https://segment.com/docs/spec/alias/
   alias(d) {
-    assertExists(d, "previousId")
+    assertExists(d, 'previousId');
     partialObj = {
-      type: "alias",
-    }
-    setAttribute(partialObj, "previousId", d.previousId)
-    obj = merge(partialObj, common(d))
-    this.events.push(obj)
-    return obj
+      type: 'alias',
+    };
+    setAttribute(partialObj, 'previousId', d.previousId);
+    obj = merge(partialObj, common(d));
+    this.events.push(obj);
+    return obj;
   },
-}
+};
 
 // https://segment.com/docs/spec/common/
 // Attributes that are defined in the spec, but will be set by Tracking API:
 // [receivedAt, version]
 function common(d) {
-  assertOneOfExists(d, ["userId", "anonymousId"])
-  let res = {}
-  setAttribute(res, "userId", d.userId)
-  setAttribute(res, "anonymousId", d.anonymousId)
-  setAttribute(res, "context", d.context) // REVISIT: Set user-agent?
-  setAttribute(res, "integrations", d.integrations)
-  setAttribute(res, "messageId", d.messageId) // REVISIT: Should buildpack hash the obj to create this ID?
-  setAttribute(res, "sentAt", d.sentAt)  // ISO-8601 date string, Timestamp of when a message is sent to Segment
+  assertOneOfExists(d, ['userId', 'anonymousId']);
+  let res = {};
+  setAttribute(res, 'userId', d.userId);
+  setAttribute(res, 'anonymousId', d.anonymousId);
+  setAttribute(res, 'context', d.context); // REVISIT: Set user-agent?
+  setAttribute(res, 'integrations', d.integrations);
+  setAttribute(res, 'messageId', d.messageId); // REVISIT: Should buildpack hash the obj to create this ID?
+  setAttribute(res, 'sentAt', d.sentAt); // ISO-8601 date string, Timestamp of when a message is sent to Segment
   // REVISIT: maybe expect some kind of Time object and we perform the toString() transformation?
-  setAttribute(res, "timestamp", d.timestamp) // ISO-8601 date string, Timestamp when the message itself took place
+  setAttribute(res, 'timestamp', d.timestamp); // ISO-8601 date string, Timestamp when the message itself took place
 
-  return res
+  return res;
 }
 
 // Sets the attribute if value is not empty
 function setAttribute(object, attribute, value) {
   if (value) {
-    object[attribute] = value
+    object[attribute] = value;
   }
 }
 
 // Throws ValidationError if the attribute is empty or undefined
 function assertExists(object, attribute) {
-  if ((typeof object[attribute] === "undefined") || (object[attribute] === "")){
-    throw new ValidationError(`${attribute} is required but not defined`)
+  if (typeof object[attribute] === 'undefined' || object[attribute] === '') {
+    throw new ValidationError(`${attribute} is required but not defined`);
   }
-  return true
+  return true;
 }
 
 function assertOneOfExists(object, attributes) {
   if (typeof attributes === 'string') {
-    attributes = [attributes]
+    attributes = [attributes];
   }
 
   for (let attribute of attributes) {
-    if (object[attribute]){
-      return true
+    if (object[attribute]) {
+      return true;
     }
   }
 
-  throw new ValidationError(`One of ${attributes} is required but not defined`)
+  throw new ValidationError(`One of ${attributes} is required but not defined`);
 }
 
 // Create a 'dummy' window object. This makes the environment more

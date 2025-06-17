@@ -40,9 +40,7 @@
         "id": 1,
         "is_bulk_update": false,
         "object": "note",
-        "permitted_user_ids": [
-          "*"
-        ],
+        "permitted_user_ids": ["*"],
         "pipedrive_service_name": false,
         "timestamp": 1561559452,
         "timestamp_micro": 1561559452120913,

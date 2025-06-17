@@ -6,18 +6,14 @@
           "id": 245711250,
           "type": "StandaloneCampaign",
           "cached_slug": 245711250,
-          "tag_names": [
-            "default"
-          ],
+          "tag_names": ["default"],
           "origin_min_age": null,
           "origin_max_age": null,
           "new_customer": null
         },
         "share_type": "email",
         "share_info": {
-          "recipients": [
-            "john@example.com"
-          ]
+          "recipients": ["john@example.com"]
         },
         "origin": {
           "id": 787332138,
@@ -30,6 +26,6 @@
       "site": "segment-com",
       "type": "post_share_web_hook",
       "test": true
-    }    
+    }
   }
 }

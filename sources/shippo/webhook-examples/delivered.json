@@ -27,8 +27,7 @@
           "city": "Chicago",
           "state": "IL"
         },
-        "messages": [
-        ],
+        "messages": [],
         "tracking_number": "SHIPPO_DELIVERED",
         "servicelevel": {
           "token": "shippo_priority"
@@ -95,6 +94,6 @@
         }
       },
       "event": "track_updated"
-    }    
+    }
   }
 }

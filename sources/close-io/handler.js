@@ -1,11 +1,11 @@
 /**
-* Please do not delete [used for Intellisense]
-* @param {ServerRequest} request The incoming webhook request
-* @param {Object.<string, any>} settings Custom settings
-* @return void
-*/
+ * Please do not delete [used for Intellisense]
+ * @param {ServerRequest} request The incoming webhook request
+ * @param {Object.<string, any>} settings Custom settings
+ * @return void
+ */
 async function onRequest(request, settings) {
-  let eventBody = request.json()
+  let eventBody = request.json();
 
   if (eventBody.event.object_type == 'opportunity') {
     Segment.set({
@@ -39,9 +39,9 @@ async function onRequest(request, settings) {
         user_id: eventBody.event.data.user_id,
         created_by: eventBody.event.data.created_by,
         webhookId: eventBody.subscription_id, // id of the incoming webhook
-        source: 'Close.io'
-      }
-    })
+        source: 'Close.io',
+      },
+    });
   }
 
   if (eventBody.event.object_type == 'lead') {
@@ -66,9 +66,9 @@ async function onRequest(request, settings) {
         description: eventBody.event.data.description,
         updated_by_name: eventBody.event.data.updated_by_name,
         webhookId: eventBody.subscription_id, // id of the incoming webhook
-        source: 'Close.io'
-      }
-    })
+        source: 'Close.io',
+      },
+    });
   }
 
   if (eventBody.event.object_type == 'contact') {
@@ -89,9 +89,9 @@ async function onRequest(request, settings) {
         id: eventBody.event.data.id,
         emails: eventBody.event.data.emails,
         webhookId: eventBody.subscription_id, // id of the incoming webhook
-        source: 'Close.io'
-      }
-    })
+        source: 'Close.io',
+      },
+    });
   }
 
   if (eventBody.event.object_type == 'activity.note') {
@@ -115,9 +115,9 @@ async function onRequest(request, settings) {
         user_name: eventBody.event.data.user_name,
         organization_id: eventBody.event.data.organization_id,
         webhookId: eventBody.subscription_id, // id of the incoming webhook
-        source: 'Close.io'
-      }
-    })
+        source: 'Close.io',
+      },
+    });
   }
 
   if (eventBody.event.object_type == 'activity.call') {
@@ -165,9 +165,9 @@ async function onRequest(request, settings) {
         is_to_group_number: eventBody.event.data.is_to_group_number,
         date_updated: eventBody.event.data.date_updated,
         webhookId: eventBody.subscription_id, // id of the incoming webhook
-        source: 'Close.io'
-      }
-    })
+        source: 'Close.io',
+      },
+    });
   }
 
   if (eventBody.event.object_type == 'activity.email') {
@@ -222,14 +222,13 @@ async function onRequest(request, settings) {
         sequence_id: eventBody.event.data.sequence_id,
         updated_by_name: eventBody.event.data.updated_by_name,
         webhookId: eventBody.subscription_id, // id of the incoming webhook
-        source: 'Close.io'
-      }
-    })
+        source: 'Close.io',
+      },
+    });
   }
 
-
   if (eventBody.event.action == 'created') {
-    let formattedType = eventBody.event.object_type.split('.')
+    let formattedType = eventBody.event.object_type.split('.');
     for (let i = 0; i < formattedType.length; i++) {
       formattedType[i] = formattedType[i].charAt(0).toUpperCase() + formattedType[i].slice(1);
     }
@@ -239,18 +238,18 @@ async function onRequest(request, settings) {
       id: eventBody.event.data.id,
       created_by: eventBody.event.data.created_by,
       webhookId: eventBody.subscription_id, // id of the incoming webhook
-      source: 'Close.io'
-    }
+      source: 'Close.io',
+    };
 
     Segment.track({
       event: formattedType.join(' ') + ' Created',
       userId: eventBody.event.data.created_by,
-      properties: props
-    })
+      properties: props,
+    });
   }
 
   if (eventBody.event.action == 'updated') {
-    let formattedType = eventBody.event.object_type.split('.')
+    let formattedType = eventBody.event.object_type.split('.');
     for (let i = 0; i < formattedType.length; i++) {
       formattedType[i] = formattedType[i].charAt(0).toUpperCase() + formattedType[i].slice(1);
     }
@@ -261,18 +260,18 @@ async function onRequest(request, settings) {
       id: eventBody.event.data.id,
       created_by: eventBody.event.data.created_by,
       webhookId: eventBody.subscription_id, // id of the incoming webhook
-      source: 'Close.io'
-    }
+      source: 'Close.io',
+    };
 
     Segment.track({
       event: formattedType.join(' ') + ' Updated',
       userId: eventBody.event.data.created_by,
-      properties: props
-    })
+      properties: props,
+    });
   }
 
   if (eventBody.event.action == 'deleted') {
-    let formattedType = eventBody.event.object_type.split('.')
+    let formattedType = eventBody.event.object_type.split('.');
     for (let i = 0; i < formattedType.length; i++) {
       formattedType[i] = formattedType[i].charAt(0).toUpperCase() + formattedType[i].slice(1);
     }
@@ -283,13 +282,13 @@ async function onRequest(request, settings) {
       id: eventBody.event.data.id,
       created_by: eventBody.event.data.created_by,
       webhookId: eventBody.subscription_id, // id of the incoming webhook
-      source: 'Close.io'
-    }
+      source: 'Close.io',
+    };
 
     Segment.track({
       event: formattedType.join(' ') + ' Deleted',
       userId: eventBody.event.data.created_by,
-      properties: props
-    })
+      properties: props,
+    });
   }
 }

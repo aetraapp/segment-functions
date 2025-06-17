@@ -11,9 +11,7 @@
           "id": 465557015,
           "type": "StandaloneCampaign",
           "cached_slug": 465557015,
-          "tag_names": [
-            "default"
-          ],
+          "tag_names": ["default"],
           "origin_min_age": null,
           "origin_max_age": null,
           "new_customer": null
@@ -38,6 +36,6 @@
       "site": "segment-com",
       "type": "claim_signup_web_hook",
       "test": true
-    }    
+    }
   }
 }

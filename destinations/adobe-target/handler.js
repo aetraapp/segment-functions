@@ -19,66 +19,62 @@ These simple steps are required to make this work:
 
 /* MANDATORY CONFIG */
 
-let adobeClientCode = "" //Your Adobe Client Code. If you don’t know your client code, in the Target UI click Setup > Implementation > Edit At.js/Mbox.js Settings. The client code is shown in the Client field.
-let adobeIdTraitName = "target-id"  //Per the Prerequisites above, you must collect Adobe's Mbox PCID onto your Personas user profiles in Segment, for matching purposes. Please confirm the property name you are using.
+let adobeClientCode = ''; //Your Adobe Client Code. If you don’t know your client code, in the Target UI click Setup > Implementation > Edit At.js/Mbox.js Settings. The client code is shown in the Client field.
+let adobeIdTraitName = 'target-id'; //Per the Prerequisites above, you must collect Adobe's Mbox PCID onto your Personas user profiles in Segment, for matching purposes. Please confirm the property name you are using.
 
-let profileSpaceID = "" //Your Segment Personas Space ID, so that this function can fetch from the Profile API. Find this in Personas > Settings > API Access.
-let profileApiToken = "" //An Access Token, to read from your Personas Instance. Grant an API Secret via Personas > Settings > API Access.
+let profileSpaceID = ''; //Your Segment Personas Space ID, so that this function can fetch from the Profile API. Find this in Personas > Settings > API Access.
+let profileApiToken = ''; //An Access Token, to read from your Personas Instance. Grant an API Secret via Personas > Settings > API Access.
 
 /* END CONFIG */
 
-
-
-let targetProfileUpdateUrl = "https://"+adobeClientCode+".tt.omtrdc.net/m2/"+adobeClientCode+"/profile/update?mboxPC=IDENTITY-PLACEHOLDER"
-let profileUrl = "https://profiles.segment.com/v1/spaces/"+profileSpaceID+"/collections/users/profiles/user_id:UID-PLACEHOLDER/traits?include="+adobeIdTraitName
-let adobeIdValue = ""
+let targetProfileUpdateUrl =
+  'https://' + adobeClientCode + '.tt.omtrdc.net/m2/' + adobeClientCode + '/profile/update?mboxPC=IDENTITY-PLACEHOLDER';
+let profileUrl =
+  'https://profiles.segment.com/v1/spaces/' +
+  profileSpaceID +
+  '/collections/users/profiles/user_id:UID-PLACEHOLDER/traits?include=' +
+  adobeIdTraitName;
+let adobeIdValue = '';
 
 let profileApiAuthHeaders = new Headers({
-    Authorization: "Basic "+btoa(profileApiToken+":")
-  })
+  Authorization: 'Basic ' + btoa(profileApiToken + ':'),
+});
 
 async function onIdentify(event, settings) {
   //Check mandatory config
-  if(!checkMandatoryConfig())
-    throw new ValidationError("Adobe and Profile API mandatory credentials were not set")
-  
+  if (!checkMandatoryConfig()) throw new ValidationError('Adobe and Profile API mandatory credentials were not set');
+
   // first, grab adobe target mbox PCID. if it doesn't exist, this user cannot be updated in adobe target.
   // replace userId to fetch from Personas
   if ('userId' in event && event['userId'] != null) {
-		profileUrl = profileUrl.replace(
-			'UID-PLACEHOLDER',
-			'user_id:' + event.userId
-		);
-	} else if ('anonymousId' in event) {
-		profileUrl = profileUrl.replace(
-			'UID-PLACEHOLDER',
-			'anonymous_id:' + event.anonymousId
-		);
-	}
-  
-  const fetchIdFromPersonas = await fetch(profileUrl, {
-    method: "GET",
-    headers: profileApiAuthHeaders
-  })
+    profileUrl = profileUrl.replace('UID-PLACEHOLDER', 'user_id:' + event.userId);
+  } else if ('anonymousId' in event) {
+    profileUrl = profileUrl.replace('UID-PLACEHOLDER', 'anonymous_id:' + event.anonymousId);
+  }
 
-  let profileApiResponse = await fetchIdFromPersonas.json()
+  const fetchIdFromPersonas = await fetch(profileUrl, {
+    method: 'GET',
+    headers: profileApiAuthHeaders,
+  });
+
+  let profileApiResponse = await fetchIdFromPersonas.json();
   if (adobeIdTraitName in profileApiResponse.traits) {
-    adobeIdValue = profileApiResponse.traits[adobeIdTraitName]
+    adobeIdValue = profileApiResponse.traits[adobeIdTraitName];
   }
 
   //update identity on the adobe target update call
-  targetProfileUpdateUrl = targetProfileUpdateUrl.replace("IDENTITY-PLACEHOLDER", adobeIdValue)
-  
+  targetProfileUpdateUrl = targetProfileUpdateUrl.replace('IDENTITY-PLACEHOLDER', adobeIdValue);
+
   Object.entries(event.traits).forEach(function (kvPair) {
-    let queryStringAddition = "&profile."+kvPair[0]+"="+kvPair[1]
-    console.log(queryStringAddition)
-    targetProfileUpdateUrl += queryStringAddition 
-  })
-  
+    let queryStringAddition = '&profile.' + kvPair[0] + '=' + kvPair[1];
+    console.log(queryStringAddition);
+    targetProfileUpdateUrl += queryStringAddition;
+  });
+
   const updateTargetProfile = await fetch(targetProfileUpdateUrl, {
-    method: "GET"
-  })
-  return await targetProfileUpdateUrl.text
+    method: 'GET',
+  });
+  return await targetProfileUpdateUrl.text;
 }
 
 function checkMandatoryConfig() {

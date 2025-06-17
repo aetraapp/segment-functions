@@ -74,9 +74,7 @@
           "current": []
         },
         "object": "deal",
-        "permitted_user_ids": [
-          9542701
-        ],
+        "permitted_user_ids": [9542701],
         "pipedrive_service_name": false,
         "timestamp": 1561559392,
         "timestamp_micro": 1561559392560811,

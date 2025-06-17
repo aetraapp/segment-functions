@@ -1,6 +1,6 @@
 // This destinations sends data to https://requestbin.com/ for introspection
 // Create a request bin and update this endpoint
-const endpoint = new URL("https://REDACTED.x.pipedream.net")
+const endpoint = new URL('https://REDACTED.x.pipedream.net');
 
 /**
  * onTrack takes a Track event and POSTs it to an external API with fetch()
@@ -10,18 +10,18 @@ const endpoint = new URL("https://REDACTED.x.pipedream.net")
  * @return any
  */
 async function onTrack(event, settings) {
-  endpoint.searchParams.set("ts", event.timestamp)
+  endpoint.searchParams.set('ts', event.timestamp);
 
   const res = await fetch(endpoint, {
     body: JSON.stringify(event),
     headers: new Headers({
-      "Authentication": 'Basic ' + btoa(settings.apiKey),
-      "Content-Type": "application/json",
+      Authentication: 'Basic ' + btoa(settings.apiKey),
+      'Content-Type': 'application/json',
     }),
-    method: "post",
-  })
+    method: 'post',
+  });
 
-  return await res.json() // or res.text() for non-JSON APIs
+  return await res.json(); // or res.text() for non-JSON APIs
 }
 
 /**
@@ -33,7 +33,7 @@ async function onTrack(event, settings) {
  */
 async function onIdentify(event, settings) {
   const PII = ['ssn', 'first_name', 'last_name', 'name', 'email'];
-  PII.forEach(i => delete event[i]);
+  PII.forEach((i) => delete event[i]);
 
   const resp = await fetch('https://reqres.in/api/users/2');
   const user = await resp.json();
@@ -43,10 +43,10 @@ async function onIdentify(event, settings) {
 
   const res = await fetch(endpoint, {
     body: JSON.stringify(event),
-    method: "post",
-  })
+    method: 'post',
+  });
 
-  return await res.json()
+  return await res.json();
 }
 
 /**
@@ -58,7 +58,7 @@ async function onIdentify(event, settings) {
  */
 async function onGroup(event, settings) {
   if (!event.company) {
-    throw new InvalidEventPayload("company is required")
+    throw new InvalidEventPayload('company is required');
   }
 }
 
@@ -71,7 +71,7 @@ async function onGroup(event, settings) {
  */
 async function onPage(event, settings) {
   if (!settings.accountId) {
-    throw new ValidationError("Account ID is required")
+    throw new ValidationError('Account ID is required');
   }
 }
 
@@ -83,7 +83,7 @@ async function onPage(event, settings) {
  * @return any
  */
 async function onAlias(event, settings) {
-  throw new EventNotSupported("alias not supported")
+  throw new EventNotSupported('alias not supported');
 }
 
 /**

@@ -22,18 +22,14 @@ async function onIdentify(event, settings) {
   let fetchedUser;
   // fetch from profile api additional enrichhment
   try {
-    fetchedUser = await fetchProfile(
-      event.userId,
-      settings.spaceId,
-      settings.profileApiToken
-    );
+    fetchedUser = await fetchProfile(event.userId, settings.spaceId, settings.profileApiToken);
   } catch (error) {
     // Retry on connection error'
     throw new RetryError(error.message);
   }
   let payload = {
     email: event.traits.email,
-    extRef: event.userId
+    extRef: event.userId,
   };
   let user = await fetchedUser.json();
   let { firstName, lastName, shippingCountry, sellerTier } = user.traits;
@@ -43,7 +39,7 @@ async function onIdentify(event, settings) {
     payload.lastName = lastName;
     payload.embeddedData = {
       shippingCountry,
-      sellerTier
+      sellerTier,
     };
   }
   console.log('final payload: ', payload);
@@ -52,9 +48,9 @@ async function onIdentify(event, settings) {
       method: 'POST',
       headers: {
         'X-API-TOKEN': settings.apiToken,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
   } catch (error) {
     // Retry on connection error
@@ -119,18 +115,14 @@ async function fetchProfile(lookup_value, space_id, profile_api_token) {
       method: 'GET',
       headers: {
         Authorization: `Basic ${btoa(profile_api_token + ':')}`,
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
   } catch (error) {
     // Retry on connection error
     throw new RetryError(error.message);
   }
-  if (
-    response.status >= 500 ||
-    response.status == 429 ||
-    response.status == 401
-  ) {
+  if (response.status >= 500 || response.status == 429 || response.status == 401) {
     // Retry on 5xx (server errors) and 429s (rate limits)
     throw new RetryError(`Failed with ${response.status}`);
   }

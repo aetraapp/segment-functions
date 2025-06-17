@@ -1,20 +1,20 @@
 /**
-* Please do not delete [used for Intellisense]
-* @param {ServerRequest} request The incoming webhook request
-* @param {Object.<string, any>} settings Custom settings
-* @return void
-*/
+ * Please do not delete [used for Intellisense]
+ * @param {ServerRequest} request The incoming webhook request
+ * @param {Object.<string, any>} settings Custom settings
+ * @return void
+ */
 async function onRequest(request, settings) {
-// exports.processEvents = async (event) => {
-  const body = request.json()
+  // exports.processEvents = async (event) => {
+  const body = request.json();
   const { data } = body;
   const { tracking_status } = data;
   const properties = getProperties(body);
   Segment.set({
     collection: 'shipment',
     id: tracking_status.object_id,
-    properties
-  })
+    properties,
+  });
 }
 
 /**
@@ -26,7 +26,7 @@ function getTypedAddress(type, address) {
   const ret = {};
   Object.keys(address).forEach((key) => {
     ret[`${type}_${key}`] = address[key];
-  })
+  });
   return ret;
 }
 
@@ -44,9 +44,6 @@ function getProperties(body) {
     tracking_number,
     status: tracking_status.status,
     ...getTypedAddress('from', address_from),
-    ...getTypedAddress('to', address_to)
-  }
+    ...getTypedAddress('to', address_to),
+  };
 }
-
-
-

@@ -1,9 +1,9 @@
 /**
-* Please do not delete [used for Intellisense]
-* @param {ServerRequest} request The incoming webhook request
-* @param {Object.<string, any>} settings Custom settings
-* @return void
-*/
+ * Please do not delete [used for Intellisense]
+ * @param {ServerRequest} request The incoming webhook request
+ * @param {Object.<string, any>} settings Custom settings
+ * @return void
+ */
 async function onRequest(request, settings) {
   return transform(request.json());
 }
@@ -13,8 +13,8 @@ function transform(event) {
   let eventObject = eventData.current;
 
   if (eventObject == null) {
-    console.log("No Event: " + eventData.meta.object);
-    return
+    console.log('No Event: ' + eventData.meta.object);
+    return;
   }
 
   if (eventData.meta.object == 'deal') {
@@ -26,7 +26,7 @@ function transform(event) {
   } else if (eventData.meta.object == 'person') {
     createPersonObject(eventData);
   } else {
-    console.log("Unsupported Event: " + eventData.meta.object);
+    console.log('Unsupported Event: ' + eventData.meta.object);
   }
 
   // Send an event when a deal is added to
@@ -34,15 +34,15 @@ function transform(event) {
   if (eventData.event == 'added.deal') {
     Segment.track({
       event: 'Deal Added',
-      userId: "" + eventObject.user_id,
+      userId: '' + eventObject.user_id,
       properties: {
         name: eventObject.title,
         value: eventObject.weighted_value,
         probability: eventObject.deal_probability,
         status: eventObject.status,
-        currency: eventObject.currency
-      }
-    })
+        currency: eventObject.currency,
+      },
+    });
   }
 }
 
@@ -50,8 +50,8 @@ function createDealObject(eventData) {
   let currentData = eventData.current;
 
   Segment.set({
-    collection: eventData.meta.object + "s",
-    id: "" + eventData.meta.id,
+    collection: eventData.meta.object + 's',
+    id: '' + eventData.meta.id,
     properties: {
       active: currentData.active,
       timeAdded: currentData.add_time,
@@ -70,17 +70,17 @@ function createDealObject(eventData) {
       status: currentData.status,
       title: currentData.title,
       value: currentData.value,
-      wonTime: currentData.won_time
-    }
-  })
+      wonTime: currentData.won_time,
+    },
+  });
 }
 
 function createOrganizationObject(eventData) {
   let currentData = eventData.current;
 
   Segment.set({
-    collection: eventData.meta.object + "s",
-    id: "" + eventData.meta.id,
+    collection: eventData.meta.object + 's',
+    id: '' + eventData.meta.id,
     properties: {
       active: currentData.active_flag,
       timeAdded: currentData.add_time,
@@ -97,17 +97,17 @@ function createOrganizationObject(eventData) {
       ownerId: currentData.owner_id,
       ownerName: currentData.owner_name,
       updatedTime: currentData.update_time,
-      wonDealsCount: currentData.won_deals_count
-    }
-  })
+      wonDealsCount: currentData.won_deals_count,
+    },
+  });
 }
 
 function createNoteObject(eventData) {
   let currentData = eventData.current;
 
   Segment.set({
-    collection: eventData.meta.object + "s",
-    id: "" + eventData.meta.id,
+    collection: eventData.meta.object + 's',
+    id: '' + eventData.meta.id,
     properties: {
       active: currentData.active_flag,
       timeAdded: currentData.add_time,
@@ -117,17 +117,17 @@ function createNoteObject(eventData) {
       organizationId: currentData.org_id,
       organization_name: currentData.organization.name,
       personId: currentData.person_id,
-      personName: currentData.person.name
-    }
-  })
+      personName: currentData.person.name,
+    },
+  });
 }
 
 function createPersonObject(eventData) {
   let currentData = eventData.current;
 
   Segment.set({
-    collection: eventData.meta.object + "s",
-    id: "" + eventData.meta.id,
+    collection: eventData.meta.object + 's',
+    id: '' + eventData.meta.id,
     properties: {
       active: currentData.active_flag,
       timeAdded: currentData.add_time,
@@ -142,7 +142,7 @@ function createPersonObject(eventData) {
       ownerId: currentData.owner_id,
       ownerName: currentData.owner_name,
       updatedTime: currentData.updated_time,
-      wonDealsCount: currentData.won_deals_count
-    }
-  })
+      wonDealsCount: currentData.won_deals_count,
+    },
+  });
 }

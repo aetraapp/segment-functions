@@ -80,8 +80,7 @@
           },
           "receipt_email": null,
           "receipt_number": null,
-          "receipt_url":
-            "https://pay.stripe.com/receipts/acct_170xf8DJPTOKB2cy/ch_18dlceDJPTOKB2cy0RMNOfxB/rcpt_EHp4VuHC9tTnYfGCyD1ffQin0TY4Vcc",
+          "receipt_url": "https://pay.stripe.com/receipts/acct_170xf8DJPTOKB2cy/ch_18dlceDJPTOKB2cy0RMNOfxB/rcpt_EHp4VuHC9tTnYfGCyD1ffQin0TY4Vcc",
           "refunded": false,
           "refunds": {
             "object": "list",

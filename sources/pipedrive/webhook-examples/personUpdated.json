@@ -71,9 +71,7 @@
           "current": []
         },
         "object": "person",
-        "permitted_user_ids": [
-          9542701
-        ],
+        "permitted_user_ids": [9542701],
         "pipedrive_service_name": false,
         "timestamp": 1561559474,
         "timestamp_micro": 1561559474460669,

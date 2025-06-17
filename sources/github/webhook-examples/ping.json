@@ -11,9 +11,7 @@
         "id": 119977719,
         "name": "web",
         "active": true,
-        "events": [
-          "*"
-        ],
+        "events": ["*"],
         "config": {
           "content_type": "form",
           "insecure_ssl": "0",

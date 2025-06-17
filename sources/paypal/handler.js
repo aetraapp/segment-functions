@@ -1,14 +1,14 @@
 /**
-* Paypal Supported Objects: order, plan, checkout-order
-* Paypal Supported Events: Order Completed
-*
-* Please do not delete [used for Intellisense]
-* @param {ServerRequest} request The incoming webhook request
-* @param {Object.<string, any>} settings Custom settings
-* @return void
-*/
+ * Paypal Supported Objects: order, plan, checkout-order
+ * Paypal Supported Events: Order Completed
+ *
+ * Please do not delete [used for Intellisense]
+ * @param {ServerRequest} request The incoming webhook request
+ * @param {Object.<string, any>} settings Custom settings
+ * @return void
+ */
 async function onRequest(request, settings) {
-  let eventBody = request.json()
+  let eventBody = request.json();
 
   if (eventBody.resource_type == 'order') {
     Segment.set({
@@ -26,9 +26,9 @@ async function onRequest(request, settings) {
         isFinalCapture: eventBody.resource.is_final_capture,
         state: eventBody.resource.state,
         webhookId: eventBody.id, // id of the incoming webhook
-        source: 'Paypal'
-      }
-    })
+        source: 'Paypal',
+      },
+    });
   }
 
   if (eventBody.resource_type == 'plan') {
@@ -43,9 +43,9 @@ async function onRequest(request, settings) {
         sequence: eventBody.resource.sequence,
         tier_mode: eventBody.resource.volume,
         webhookId: eventBody.id, // id of the incoming webhook
-        source: 'Paypal'
-      }
-    })
+        source: 'Paypal',
+      },
+    });
   }
 
   if (eventBody.resource_type == 'checkout-order') {
@@ -56,19 +56,19 @@ async function onRequest(request, settings) {
       currency: eventBody.resource.gross_amount.currency_code,
       status: eventBody.resource.status,
       webhookId: eventBody.id, // id of the incoming webhook
-      source: 'Paypal'
-    }
+      source: 'Paypal',
+    };
 
     Segment.set({
       collection: eventBody.resource_type,
       id: eventBody.resource.id,
-      properties: props
-    })
+      properties: props,
+    });
 
     Segment.track({
       event: 'Order Completed',
       userId: eventBody.resource.payer.payer_id,
-      properties: props
-    })
+      properties: props,
+    });
   }
 }

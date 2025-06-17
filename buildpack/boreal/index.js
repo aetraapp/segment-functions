@@ -54,8 +54,8 @@ function defaultDestinationHandler(event, settings) {
 // @param {string|Object} queryParameters - Parameter string or key/value map.
 // @return {string} The absolute URL.
 function createURL(queryParameters) {
-  let url = "https://fn.segmentapis.com/";
-  if (typeof queryParameters === "string") {
+  let url = 'https://fn.segmentapis.com/';
+  if (typeof queryParameters === 'string') {
     if (queryParameters[0] !== '?') {
       url += '?';
     }
@@ -71,7 +71,7 @@ function createURL(queryParameters) {
         params.append(key, val);
       }
     }
-    url += "?" + params.toString();
+    url += '?' + params.toString();
   }
   return url;
 }
@@ -86,10 +86,10 @@ function createURL(queryParameters) {
 // @param {string|Object} [payload.payload.queryParameters] - Request query string or parsed key/value pairs.
 // @param {Object} payload.settings - Settings object.
 // @return {Object} Resulting events and/or objects.
-exports.processSourcePayload = async payload => {
+exports.processSourcePayload = async (payload) => {
   const exports = { onRequest: defaultSourceHandler };
 
-  const handler = loadModule("./handler", { exports, cache: sourceCache });
+  const handler = loadModule('./handler', { exports, cache: sourceCache });
   const fn = handler.onRequest;
   if (typeof fn === 'function') {
     let { body, headers, url, queryParameters } = payload.payload;
@@ -102,13 +102,13 @@ exports.processSourcePayload = async payload => {
     await fn(request, settings);
 
     // collect and reset implicit messages
-    const { events, objects } = Segment
-    Segment.events = []
-    Segment.objects = []
+    const { events, objects } = Segment;
+    Segment.events = [];
+    Segment.objects = [];
 
     return { events, objects };
   }
-}
+};
 
 // The entry point for destination functions.
 //
@@ -116,7 +116,7 @@ exports.processSourcePayload = async payload => {
 // @param {Object} payload.event - Parsed event object.
 // @param {Object} payload.settings - Settings object.
 // @return {any} Results of the event handler function.
-exports.processDestinationPayload = async payload => {
+exports.processDestinationPayload = async (payload) => {
   const { event, settings } = payload;
   const handlerName = eventNames[event.type];
   if (!handlerName) {
@@ -132,7 +132,7 @@ exports.processDestinationPayload = async payload => {
     return obj;
   }, {});
 
-  const handler = loadModule("./handler", { exports, cache: destinationCache });
+  const handler = loadModule('./handler', { exports, cache: destinationCache });
   const fn = handler[handlerName];
   if (typeof fn === 'function') {
     return await fn(event, settings);
@@ -201,15 +201,9 @@ function loadModule(request, options) {
 
   // Collect all the default exported values into an array. This gets spread
   // into the module loading function.
-  const defaults = options && options.exports
-    ? Object.values(options.exports)
-    : [];
+  const defaults = options && options.exports ? Object.values(options.exports) : [];
 
-  context.call(
-    /* this     = */ contextWindow,
-    /* exports  = */ mod.exports,
-    /* defaults = */ ...defaults
-  );
+  context.call(/* this     = */ contextWindow, /* exports  = */ mod.exports, /* defaults = */ ...defaults);
   mod.loaded = true;
 
   if (options && options.cache) {
@@ -230,7 +224,7 @@ function readModule(filename) {
   // Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
   // because the buffer-to-string conversion in `fs.readFileSync()`
   // translates it to FEFF, the UTF-16 BOM.
-  if (code.charCodeAt(0) === 0xFEFF) {
+  if (code.charCodeAt(0) === 0xfeff) {
     code = code.slice(1);
   }
 
@@ -264,7 +258,7 @@ function readModule(filename) {
 // @return {string} Source code to evaluate.
 function wrapModule(code, options) {
   // exportArg is the randomly generated export object symbol.
-  const exportArg = "__exports" + Math.round(Math.random() * 1000000);
+  const exportArg = '__exports' + Math.round(Math.random() * 1000000);
 
   // exportArgs is the string containing the comma-separated arguments to the
   // module loader function:
@@ -282,11 +276,9 @@ function wrapModule(code, options) {
     }
   }
 
-  return (
-`(function (${exportArg}${exportArgs}) {
+  return `(function (${exportArg}${exportArgs}) {
   ${exportAssign}
   ${code};
   ${exportAssign}
-});`
-);
+});`;
 }

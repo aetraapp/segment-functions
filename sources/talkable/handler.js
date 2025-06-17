@@ -1,20 +1,20 @@
 /**
-* Please do not delete [used for Intellisense]
-* @param {ServerRequest} request The incoming webhook request
-* @param {Object.<string, any>} settings Custom settings
-* @return void
-*/
+ * Please do not delete [used for Intellisense]
+ * @param {ServerRequest} request The incoming webhook request
+ * @param {Object.<string, any>} settings Custom settings
+ * @return void
+ */
 async function onRequest(request, settings) {
-  let eventBody = request.json()
+  let eventBody = request.json();
 
   let returnValue = {
     objects: [],
-    events: []
-  }
-  let payload = eventBody.payload
+    events: [],
+  };
+  let payload = eventBody.payload;
   let eventObj = {
-    properties: { ...payload, source: 'Talkable' }
-  }
+    properties: { ...payload, source: 'Talkable' },
+  };
 
   switch (eventBody.type) {
     case 'unsubscribe_web_hook':
@@ -58,12 +58,16 @@ async function onRequest(request, settings) {
   }
 
   // adding in email as an externalId
-  eventObj.context = { externalIds: [{
-    id: eventObj.anonymousId,
-    type: 'email',
-    encoding: 'none',
-    collection: 'users'
-  }]}
+  eventObj.context = {
+    externalIds: [
+      {
+        id: eventObj.anonymousId,
+        type: 'email',
+        encoding: 'none',
+        collection: 'users',
+      },
+    ],
+  };
 
-  Segment.track(eventObj)
+  Segment.track(eventObj);
 }

@@ -6,9 +6,7 @@
           "id": 181323269,
           "type": "StandaloneCampaign",
           "cached_slug": 181323269,
-          "tag_names": [
-            "default"
-          ],
+          "tag_names": ["default"],
           "origin_min_age": null,
           "origin_max_age": null,
           "new_customer": null

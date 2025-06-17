@@ -12,7 +12,7 @@ async function onRequest(request, settings) {
     userId: eventBody.resources.respondent_id,
     timestamp: eventBody.event_datetime,
     properties: {
-      source: "SurveyMonkey",
+      source: 'SurveyMonkey',
       name: eventBody.name,
       objectType: eventBody.object_type,
       objectId: eventBody.object_id,
@@ -28,8 +28,8 @@ async function onRequest(request, settings) {
         recipientId: eventBody.resources.recipient_id,
         userId: eventBody.resources.user_id,
         collectorId: eventBody.resources.collector_id,
-        surveyId: eventBody.resources.survey_id
-      }
-    }
-  })
+        surveyId: eventBody.resources.survey_id,
+      },
+    },
+  });
 }
