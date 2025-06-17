@@ -40,6 +40,12 @@ this repo as the set of examples.
 - [Datadog](./destinations/datadog) - Sends a metric to datadog with high level message/event type as tags
 - [Optimizely](./destinations/optimizely) - Sends conversion metrix to optimizely.
 
+## Destination Insert Functions
+
+- [Enrich with Company Data](./destination-inserts/enrich-with-company-data) - Enriches identify events with company information based on email domain
+- [PII Filter](./destination-inserts/pii-filter) - Filters out or masks personally identifiable information before sending to destinations
+- [Event Transformer](./destination-inserts/event-transformer) - Transforms events with standardized formatting, derived values, and data enrichment
+
 ## Development
 
 Run tests with:

@@ -85,6 +85,20 @@ class InvalidEventPayload extends Error {
   }
 }
 
+class RetryError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+class DropEvent extends Error {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
 const Segment = {
   events: [],
   objects: [],
@@ -253,5 +267,7 @@ module.exports = {
   ValidationError,
   EventNotSupported,
   InvalidEventPayload,
+  RetryError,
+  DropEvent,
   Segment,
 };

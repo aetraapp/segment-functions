@@ -13,6 +13,7 @@ const window = require('./window');
 const { Segment, EventNotSupported, ServerRequest, URLSearchParams } = window;
 const sourceCache = {};
 const destinationCache = {};
+const insertCache = {};
 
 // These are the names of the accepted event types mapped to the destination
 // function names for handling the evente. This drives the definition of the
@@ -48,6 +49,17 @@ function defaultDestinationHandler(event, settings) {
   throw new EventNotSupported(`${event.type} not supported`);
 }
 
+// This is the default handler for all insert function event types. The loaded
+// module is expected to override one or more of these handlers. For any not
+// defined in the custom module, the event is passed through unchanged.
+//
+// @param {Object} event - Incoming event object.
+// @param {Object} settings - Settings object.
+// @return {Object} The unmodified event.
+function defaultInsertHandler(event, settings) {
+  return event;
+}
+
 // Create an absolute URL given the query parameters as either a string or an
 // object.
 //
@@ -62,9 +74,9 @@ function createURL(queryParameters) {
     url += queryParameters;
   } else if (typeof queryParameters === 'object' && queryParameters) {
     const params = new URLSearchParams();
-    for (let [key, val] of Object.entries(queryParameters)) {
+    for (const [key, val] of Object.entries(queryParameters)) {
       if (Array.isArray(val)) {
-        for (let item of val) {
+        for (const item of val) {
           params.append(key, item);
         }
       } else {
@@ -98,7 +110,7 @@ exports.processSourcePayload = async (payload) => {
     }
 
     const request = new ServerRequest(body, { headers, url });
-    let settings = payload.settings || {};
+    const settings = payload.settings || {};
     await fn(request, settings);
 
     // collect and reset implicit messages
@@ -137,6 +149,38 @@ exports.processDestinationPayload = async (payload) => {
   if (typeof fn === 'function') {
     return await fn(event, settings);
   }
+};
+
+// The entry point for insert functions.
+//
+// @param {Object} payload - Settings and captured values of the web request.
+// @param {Object} payload.event - Parsed event object.
+// @param {Object} payload.settings - Settings object.
+// @return {Object} The modified event to pass to the destination.
+exports.processInsertFunctionPayload = async (payload) => {
+  const { event, settings } = payload;
+  const handlerName = eventNames[event.type];
+  if (!handlerName) {
+    return event;
+  }
+
+  // Create intial module-scoped globals using the event handler names:
+  //    exports.onIdentify = defaultInsertHandler
+  //    exports.onTrack = defaultInsertHandler
+  //    ...
+  const exports = Object.values(eventNames).reduce((obj, n) => {
+    obj[n] = defaultInsertHandler;
+    return obj;
+  }, {});
+
+  const handler = loadModule('./handler', { exports, cache: insertCache });
+  const fn = handler[handlerName];
+  if (typeof fn === 'function') {
+    return await fn(event, settings);
+  }
+
+  // If no handler is defined, pass through the event unchanged
+  return event;
 };
 
 // This is a very distilled version of the Node.js/CommonJS module loading
@@ -270,7 +314,7 @@ function wrapModule(code, options) {
   let exportAssign = '';
 
   if (options && options.exports) {
-    for (let name of Object.keys(options.exports)) {
+    for (const name of Object.keys(options.exports)) {
       exportArgs += `, ${name}`;
       exportAssign += `${exportArg}.${name} = ${name};`;
     }
