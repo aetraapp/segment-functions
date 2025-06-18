@@ -55,7 +55,10 @@
                   },
                   "seller_protection": {
                     "status": "ELIGIBLE",
-                    "dispute_categories": ["ITEM_NOT_RECEIVED", "UNAUTHORIZED_TRANSACTION"]
+                    "dispute_categories": [
+                      "ITEM_NOT_RECEIVED",
+                      "UNAUTHORIZED_TRANSACTION"
+                    ]
                   },
                   "final_capture": true,
                   "seller_receivable_breakdown": {

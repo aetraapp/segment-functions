@@ -17,8 +17,13 @@ async function onIdentify(event, settings) {
     event.traits['email_address'] = event.traits['email'];
     delete event.traits['email'];
   }
-  if (!event.traits['email_address'] && !(event.traits['last_name'] && event.traits['phone'])) {
-    throw new EventNotSupported('must be created with a valid email address or partial name and phone number');
+  if (
+    !event.traits['email_address'] &&
+    !(event.traits['last_name'] && event.traits['phone'])
+  ) {
+    throw new EventNotSupported(
+      'must be created with a valid email address or partial name and phone number',
+    );
   }
 
   const res = await fetch(endpoint, {

@@ -30,7 +30,9 @@ function formatTimestamp(timestamp) {
   if (!timestamp) return new Date().toISOString();
 
   const date = new Date(timestamp);
-  return Number.isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
+  return Number.isNaN(date.getTime())
+    ? new Date().toISOString()
+    : date.toISOString();
 }
 
 /**
@@ -61,13 +63,15 @@ function transformEcommerceEvent(event) {
 
   // Standardize product data
   if (event.properties.products && Array.isArray(event.properties.products)) {
-    transformed.properties.products = event.properties.products.map((product) => ({
-      ...product,
-      product_id: product.product_id || product.productId || product.id,
-      sku: product.sku || product.SKU,
-      price_cents: priceToCents(product.price),
-      quantity: Number.parseInt(product.quantity) || 1,
-    }));
+    transformed.properties.products = event.properties.products.map(
+      (product) => ({
+        ...product,
+        product_id: product.product_id || product.productId || product.id,
+        sku: product.sku || product.SKU,
+        price_cents: priceToCents(product.price),
+        quantity: Number.parseInt(product.quantity) || 1,
+      }),
+    );
   }
 
   // Calculate total if not present
@@ -80,11 +84,15 @@ function transformEcommerceEvent(event) {
 
   // Convert total to cents
   if (transformed.properties.total) {
-    transformed.properties.total_cents = priceToCents(transformed.properties.total);
+    transformed.properties.total_cents = priceToCents(
+      transformed.properties.total,
+    );
   }
 
   // Standardize currency
-  transformed.properties.currency = (transformed.properties.currency || 'USD').toUpperCase();
+  transformed.properties.currency = (
+    transformed.properties.currency || 'USD'
+  ).toUpperCase();
 
   return transformed;
 }
@@ -104,7 +112,8 @@ async function onIdentify(event, settings) {
 
     // Add computed traits
     if (event.traits.firstName && event.traits.lastName) {
-      event.traits.fullName = `${event.traits.firstName} ${event.traits.lastName}`.trim();
+      event.traits.fullName =
+        `${event.traits.firstName} ${event.traits.lastName}`.trim();
     }
 
     // Standardize created_at timestamp
@@ -118,7 +127,12 @@ async function onIdentify(event, settings) {
 
 async function onTrack(event, settings) {
   // Transform e-commerce events
-  const ecommerceEvents = ['Product Added', 'Product Removed', 'Order Completed', 'Cart Viewed'];
+  const ecommerceEvents = [
+    'Product Added',
+    'Product Removed',
+    'Order Completed',
+    'Cart Viewed',
+  ];
   if (ecommerceEvents.includes(event.event)) {
     event = transformEcommerceEvent(event);
   }
@@ -143,7 +157,10 @@ async function onTrack(event, settings) {
     const buttonText = event.properties.button_text.toLowerCase();
     if (buttonText.includes('buy') || buttonText.includes('purchase')) {
       event.event = 'Purchase Intent Shown';
-    } else if (buttonText.includes('signup') || buttonText.includes('register')) {
+    } else if (
+      buttonText.includes('signup') ||
+      buttonText.includes('register')
+    ) {
       event.event = 'Signup Intent Shown';
     }
   }
@@ -207,7 +224,9 @@ async function onGroup(event, settings) {
     if (event.traits.industry) {
       event.traits.industry = event.traits.industry
         .split(' ')
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+        )
         .join(' ');
     }
   }

@@ -245,9 +245,14 @@ function loadModule(request, options) {
 
   // Collect all the default exported values into an array. This gets spread
   // into the module loading function.
-  const defaults = options && options.exports ? Object.values(options.exports) : [];
+  const defaults =
+    options && options.exports ? Object.values(options.exports) : [];
 
-  context.call(/* this     = */ contextWindow, /* exports  = */ mod.exports, /* defaults = */ ...defaults);
+  context.call(
+    /* this     = */ contextWindow,
+    /* exports  = */ mod.exports,
+    /* defaults = */ ...defaults,
+  );
   mod.loaded = true;
 
   if (options && options.cache) {

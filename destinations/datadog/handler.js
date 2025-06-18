@@ -45,17 +45,21 @@ async function sendMetric(msg, apiKey) {
     tags: [],
   };
 
-  if (EVENT_TYPE_TAG && msg.type === 'track') metric.tags.push(`${EVENT_TYPE_TAG}:${msg.event}`);
+  if (EVENT_TYPE_TAG && msg.type === 'track')
+    metric.tags.push(`${EVENT_TYPE_TAG}:${msg.event}`);
   if (MESSAGE_TYPE_TAG) metric.tags.push(`${MESSAGE_TYPE_TAG}:${msg.type}`);
   if (SOURCE_ID_TAG) metric.tags.push(`${SOURCE_ID_TAG}:${msg.projectId}`);
 
-  const res = await fetch(`https://api.datadoghq.com/api/v1/series?api_key=${apiKey}`, {
-    body: JSON.stringify({ series: [metric] }),
-    headers: new Headers({
-      'Content-Type': 'application/json',
-    }),
-    method: 'post',
-  });
+  const res = await fetch(
+    `https://api.datadoghq.com/api/v1/series?api_key=${apiKey}`,
+    {
+      body: JSON.stringify({ series: [metric] }),
+      headers: new Headers({
+        'Content-Type': 'application/json',
+      }),
+      method: 'post',
+    },
+  );
 
   return await res.json();
 }

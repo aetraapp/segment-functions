@@ -10,7 +10,9 @@ const mapToSegment = (eventParams) => {
     eventParams.properties = {};
 
     // LP sends Unix epoch time stamps in ms
-    eventParams.timestamp = new Date(parseInt(eventParams.timestamp)).toISOString();
+    eventParams.timestamp = new Date(
+      parseInt(eventParams.timestamp),
+    ).toISOString();
 
     if (eventParams.abTestID) {
       eventParams.event = 'AB Test';

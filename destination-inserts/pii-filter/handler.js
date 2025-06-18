@@ -10,7 +10,13 @@
  */
 
 // PII fields to filter
-const PII_FIELDS = ['ssn', 'socialSecurityNumber', 'creditCard', 'creditCardNumber', 'driverLicense'];
+const PII_FIELDS = [
+  'ssn',
+  'socialSecurityNumber',
+  'creditCard',
+  'creditCardNumber',
+  'driverLicense',
+];
 
 // Fields to mask (show partial data)
 const MASK_FIELDS = ['phone', 'phoneNumber', 'email'];
@@ -101,7 +107,9 @@ function containsHighRiskPII(obj) {
 async function onIdentify(event, settings) {
   // Check for high-risk PII
   if (containsHighRiskPII(event.traits)) {
-    throw new ValidationError('Event contains high-risk PII that cannot be sent to this destination');
+    throw new ValidationError(
+      'Event contains high-risk PII that cannot be sent to this destination',
+    );
   }
 
   // Filter PII from traits
@@ -113,7 +121,9 @@ async function onIdentify(event, settings) {
 async function onTrack(event, settings) {
   // Check for high-risk PII
   if (containsHighRiskPII(event.properties)) {
-    throw new ValidationError('Event contains high-risk PII that cannot be sent to this destination');
+    throw new ValidationError(
+      'Event contains high-risk PII that cannot be sent to this destination',
+    );
   }
 
   // Filter PII from properties

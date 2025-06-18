@@ -2,7 +2,11 @@ var fs = require('fs');
 const nock = require('nock');
 const process = require('process');
 const { processDestinationPayload } = require('./buildpack/boreal');
-const { EventNotSupported, InvalidEventPayload, ValidationError } = require('./buildpack/boreal/window');
+const {
+  EventNotSupported,
+  InvalidEventPayload,
+  ValidationError,
+} = require('./buildpack/boreal/window');
 
 const destinations = fs.readdirSync(`${__dirname}/destinations`);
 const skips = [];
@@ -57,7 +61,13 @@ describe.each(destinations)('%s', (dest) => {
     try {
       await processDestinationPayload({ event, settings });
     } catch (err) {
-      if (!(err instanceof EventNotSupported || err instanceof ValidationError || err instanceof InvalidEventPayload)) {
+      if (
+        !(
+          err instanceof EventNotSupported ||
+          err instanceof ValidationError ||
+          err instanceof InvalidEventPayload
+        )
+      ) {
         fail(err);
       }
     }

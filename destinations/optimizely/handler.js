@@ -24,7 +24,8 @@ async function onTrack(event, settings) {
   var datafileId = settings.sdkKey;
   if (datafileId === undefined) return;
 
-  var dataFileUrl = 'https://cdn.optimizely.com/datafiles/' + datafileId + '.json';
+  var dataFileUrl =
+    'https://cdn.optimizely.com/datafiles/' + datafileId + '.json';
   var req = await fetch(dataFileUrl);
   //console.log(req.body);
   var json = await req.json();
@@ -135,7 +136,9 @@ function __setTags(event, payload) {
     }
 
     if (x == 'revenue') {
-      payload.snapshots[0].events[0].revenue = Math.round(parseFloat(event.properties[x]) * 100.0);
+      payload.snapshots[0].events[0].revenue = Math.round(
+        parseFloat(event.properties[x]) * 100.0,
+      );
     } else if (x == 'value') {
       payload.snapshots[0].events[0].value = event.properties[x];
     }

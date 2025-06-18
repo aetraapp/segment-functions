@@ -12,8 +12,12 @@ async function onRequest(request, settings) {
     eventOutput = { properties: {} };
 
     for (var key in batch['notificationItems'][i]['NotificationRequestItem']) {
-      if ('additionalData' in eventInput && 'shopperReference' in eventInput['additionalData']) {
-        eventOutput['userId'] = eventInput['additionalData']['shopperReference'];
+      if (
+        'additionalData' in eventInput &&
+        'shopperReference' in eventInput['additionalData']
+      ) {
+        eventOutput['userId'] =
+          eventInput['additionalData']['shopperReference'];
       } else {
         eventOutput['userId'] = 'adyen';
       }

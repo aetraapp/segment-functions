@@ -36,7 +36,14 @@ function getTypedAddress(type, address) {
  */
 function getProperties(body) {
   const { carrier, data } = body;
-  const { tracking_status, address_from, address_to, tracking_number, eta, original_eta } = data;
+  const {
+    tracking_status,
+    address_from,
+    address_to,
+    tracking_number,
+    eta,
+    original_eta,
+  } = data;
   return {
     carrier,
     eta,

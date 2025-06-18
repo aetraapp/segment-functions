@@ -2,7 +2,12 @@ const fs = require('fs');
 const nock = require('nock');
 const process = require('process');
 const { processInsertFunctionPayload } = require('./buildpack/boreal');
-const { EventNotSupported, InvalidEventPayload, ValidationError, DropEvent } = require('./buildpack/boreal/window');
+const {
+  EventNotSupported,
+  InvalidEventPayload,
+  ValidationError,
+  DropEvent,
+} = require('./buildpack/boreal/window');
 
 const insertFunctions = fs.readdirSync(`${__dirname}/destination-inserts`);
 const skips = [];

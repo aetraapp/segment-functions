@@ -3,7 +3,9 @@
     "headers": {
       "Accept": ["*/*"],
       "Accept-Encoding": ["gzip, deflate"],
-      "Close-Sig-Hash": ["c8922dd050403075e78c7720ff0fc0e4d0ee8de318be4c244a6a2b07284dbcf7"],
+      "Close-Sig-Hash": [
+        "c8922dd050403075e78c7720ff0fc0e4d0ee8de318be4c244a6a2b07284dbcf7"
+      ],
       "Close-Sig-Timestamp": ["1561595687"],
       "Content-Length": ["4043"],
       "Content-Type": ["application/json"],

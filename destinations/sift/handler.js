@@ -31,8 +31,10 @@ async function addDecisions(fields, res) {
   var decisionBody = {
     userId: fields.$user_id,
     traits: {
-      contentAbuseDecisions: res.score_response.workflow_statuses[0].history[0].config.decision_id,
-      paymentAbuseDecisions: res.score_response.workflow_statuses[0].history[0].config.decision_id,
+      contentAbuseDecisions:
+        res.score_response.workflow_statuses[0].history[0].config.decision_id,
+      paymentAbuseDecisions:
+        res.score_response.workflow_statuses[0].history[0].config.decision_id,
     },
   };
 

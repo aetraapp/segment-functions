@@ -22,7 +22,11 @@ async function onIdentify(event, settings) {
   let fetchedUser;
   // fetch from profile api additional enrichhment
   try {
-    fetchedUser = await fetchProfile(event.userId, settings.spaceId, settings.profileApiToken);
+    fetchedUser = await fetchProfile(
+      event.userId,
+      settings.spaceId,
+      settings.profileApiToken,
+    );
   } catch (error) {
     // Retry on connection error'
     throw new RetryError(error.message);
@@ -122,7 +126,11 @@ async function fetchProfile(lookup_value, space_id, profile_api_token) {
     // Retry on connection error
     throw new RetryError(error.message);
   }
-  if (response.status >= 500 || response.status == 429 || response.status == 401) {
+  if (
+    response.status >= 500 ||
+    response.status == 429 ||
+    response.status == 401
+  ) {
     // Retry on 5xx (server errors) and 429s (rate limits)
     throw new RetryError(`Failed with ${response.status}`);
   }

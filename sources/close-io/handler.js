@@ -230,7 +230,8 @@ async function onRequest(request, settings) {
   if (eventBody.event.action == 'created') {
     let formattedType = eventBody.event.object_type.split('.');
     for (let i = 0; i < formattedType.length; i++) {
-      formattedType[i] = formattedType[i].charAt(0).toUpperCase() + formattedType[i].slice(1);
+      formattedType[i] =
+        formattedType[i].charAt(0).toUpperCase() + formattedType[i].slice(1);
     }
     const props = {
       date_created: eventBody.event.data.date_created,
@@ -251,7 +252,8 @@ async function onRequest(request, settings) {
   if (eventBody.event.action == 'updated') {
     let formattedType = eventBody.event.object_type.split('.');
     for (let i = 0; i < formattedType.length; i++) {
-      formattedType[i] = formattedType[i].charAt(0).toUpperCase() + formattedType[i].slice(1);
+      formattedType[i] =
+        formattedType[i].charAt(0).toUpperCase() + formattedType[i].slice(1);
     }
     const props = {
       date_updated: eventBody.event.data.date_updated,
@@ -273,7 +275,8 @@ async function onRequest(request, settings) {
   if (eventBody.event.action == 'deleted') {
     let formattedType = eventBody.event.object_type.split('.');
     for (let i = 0; i < formattedType.length; i++) {
-      formattedType[i] = formattedType[i].charAt(0).toUpperCase() + formattedType[i].slice(1);
+      formattedType[i] =
+        formattedType[i].charAt(0).toUpperCase() + formattedType[i].slice(1);
     }
     const props = {
       date_updated: eventBody.event.data.date_updated,

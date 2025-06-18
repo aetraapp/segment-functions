@@ -3,7 +3,11 @@ const endpoint = 'https://api.lob.com/v1/postcards';
 async function onTrack(event, settings) {
   // Only call the Lob API if the item failed to be sent to the customer
   if (event.event == 'Item failed') {
-    return await callLobApi(event.properties.name, event.properties.address, settings);
+    return await callLobApi(
+      event.properties.name,
+      event.properties.address,
+      settings,
+    );
   } else {
     return;
   }
@@ -29,7 +33,8 @@ async function callLobApi(name, address, settings) {
       address_state: 'State',
       address_zip: 'Zip',
     },
-    front: "<html style='padding: 1in; font-size: 50;'>Front HTML for {{name}}</html>",
+    front:
+      "<html style='padding: 1in; font-size: 50;'>Front HTML for {{name}}</html>",
     back: "<html style='padding: 1in; font-size: 20;'>Back HTML for {{name}}</html>",
     merge_variables: {
       name: name,

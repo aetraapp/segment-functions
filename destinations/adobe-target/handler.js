@@ -28,7 +28,11 @@ let profileApiToken = ''; //An Access Token, to read from your Personas Instance
 /* END CONFIG */
 
 let targetProfileUpdateUrl =
-  'https://' + adobeClientCode + '.tt.omtrdc.net/m2/' + adobeClientCode + '/profile/update?mboxPC=IDENTITY-PLACEHOLDER';
+  'https://' +
+  adobeClientCode +
+  '.tt.omtrdc.net/m2/' +
+  adobeClientCode +
+  '/profile/update?mboxPC=IDENTITY-PLACEHOLDER';
 let profileUrl =
   'https://profiles.segment.com/v1/spaces/' +
   profileSpaceID +
@@ -42,14 +46,23 @@ let profileApiAuthHeaders = new Headers({
 
 async function onIdentify(event, settings) {
   //Check mandatory config
-  if (!checkMandatoryConfig()) throw new ValidationError('Adobe and Profile API mandatory credentials were not set');
+  if (!checkMandatoryConfig())
+    throw new ValidationError(
+      'Adobe and Profile API mandatory credentials were not set',
+    );
 
   // first, grab adobe target mbox PCID. if it doesn't exist, this user cannot be updated in adobe target.
   // replace userId to fetch from Personas
   if ('userId' in event && event['userId'] != null) {
-    profileUrl = profileUrl.replace('UID-PLACEHOLDER', 'user_id:' + event.userId);
+    profileUrl = profileUrl.replace(
+      'UID-PLACEHOLDER',
+      'user_id:' + event.userId,
+    );
   } else if ('anonymousId' in event) {
-    profileUrl = profileUrl.replace('UID-PLACEHOLDER', 'anonymous_id:' + event.anonymousId);
+    profileUrl = profileUrl.replace(
+      'UID-PLACEHOLDER',
+      'anonymous_id:' + event.anonymousId,
+    );
   }
 
   const fetchIdFromPersonas = await fetch(profileUrl, {
@@ -63,7 +76,10 @@ async function onIdentify(event, settings) {
   }
 
   //update identity on the adobe target update call
-  targetProfileUpdateUrl = targetProfileUpdateUrl.replace('IDENTITY-PLACEHOLDER', adobeIdValue);
+  targetProfileUpdateUrl = targetProfileUpdateUrl.replace(
+    'IDENTITY-PLACEHOLDER',
+    adobeIdValue,
+  );
 
   Object.entries(event.traits).forEach(function (kvPair) {
     let queryStringAddition = '&profile.' + kvPair[0] + '=' + kvPair[1];
@@ -78,5 +94,10 @@ async function onIdentify(event, settings) {
 }
 
 function checkMandatoryConfig() {
-  return !!adobeClientCode && !!adobeIdTraitName && !!profileSpaceID && !!profileApiToken;
+  return (
+    !!adobeClientCode &&
+    !!adobeIdTraitName &&
+    !!profileSpaceID &&
+    !!profileApiToken
+  );
 }

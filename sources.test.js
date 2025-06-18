@@ -1,7 +1,11 @@
 var fs = require('fs');
 const process = require('process');
 const { processSourcePayload } = require('./buildpack/boreal');
-const { EventNotSupported, InvalidEventPayload, ValidationError } = require('./buildpack/boreal/window');
+const {
+  EventNotSupported,
+  InvalidEventPayload,
+  ValidationError,
+} = require('./buildpack/boreal/window');
 
 const sources = fs.readdirSync(`${__dirname}/sources`);
 const skips = ['leanplum'];
@@ -19,7 +23,9 @@ describe.each(sources)('%s', (source) => {
   }
   for (var i = 0; i < examples.length; i++) {
     const example = examples[i];
-    const payload = JSON.parse(fs.readFileSync(`${dir}/webhook-examples/${example}`, 'utf8'));
+    const payload = JSON.parse(
+      fs.readFileSync(`${dir}/webhook-examples/${example}`, 'utf8'),
+    );
     payloads.push([example, payload]);
   }
 
@@ -36,9 +42,17 @@ describe.each(sources)('%s', (source) => {
     process.chdir(dir);
     try {
       const messages = await processSourcePayload(payload);
-      expect(messages.events.length + messages.objects.length).toBeGreaterThanOrEqual(0);
+      expect(
+        messages.events.length + messages.objects.length,
+      ).toBeGreaterThanOrEqual(0);
     } catch (err) {
-      if (!(err instanceof EventNotSupported || err instanceof ValidationError || err instanceof InvalidEventPayload)) {
+      if (
+        !(
+          err instanceof EventNotSupported ||
+          err instanceof ValidationError ||
+          err instanceof InvalidEventPayload
+        )
+      ) {
         fail(err);
       }
     }

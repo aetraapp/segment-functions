@@ -11,13 +11,16 @@ async function onRequest(request, settings) {
     );
   }
   if (!settings.workspaceSlug) {
-    throw new ValidationError("Workspace Slug is Required. Make sure you have created a 'workspaceSlug' setting.");
+    throw new ValidationError(
+      "Workspace Slug is Required. Make sure you have created a 'workspaceSlug' setting.",
+    );
   }
 
   const requestBody = request.json();
   const usersURL = `https://platform.segmentapis.com/v1beta/workspaces/${settings.workspaceSlug}/users`;
   const userId =
-    requestBody.properties.details.subject && requestBody.properties.details.subject.indexOf('users/') > -1
+    requestBody.properties.details.subject &&
+    requestBody.properties.details.subject.indexOf('users/') > -1
       ? requestBody.properties.details.subject.split('/')[1]
       : requestBody.userId;
 

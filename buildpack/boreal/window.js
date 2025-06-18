@@ -25,7 +25,8 @@ class ServerRequest {
   constructor(input, init) {
     if (init) {
       const { headers, url } = init;
-      this[_headers] = headers instanceof Headers ? headers : new Headers(headers);
+      this[_headers] =
+        headers instanceof Headers ? headers : new Headers(headers);
       this[_url] = url instanceof URL ? url : new URL(url);
     }
     switch (typeof input) {

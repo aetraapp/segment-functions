@@ -8,7 +8,9 @@ let wavefrontApiVersion = 'v2';
 let wavefrontResource = 'event';
 
 //Create endpoint
-const url = new URL(`https://${wavefrontInstance}.wavefront.com/api/${wavefrontApiVersion}/${wavefrontResource}`);
+const url = new URL(
+  `https://${wavefrontInstance}.wavefront.com/api/${wavefrontApiVersion}/${wavefrontResource}`,
+);
 
 //Properties we need in the track event
 //Note 1: we only cover instantaneous events for now as ending events later is only possible via wavefront UI manually
@@ -30,7 +32,9 @@ const annotationProperties = [
   {
     key: 'severity',
     validateFunc: (input) => {
-      return _.isString(input) && _.indexOf(['info', 'warn', 'severe'], input) > -1;
+      return (
+        _.isString(input) && _.indexOf(['info', 'warn', 'severe'], input) > -1
+      );
     },
   },
 ];
@@ -50,7 +54,8 @@ async function onTrack(event, settings) {
   };
   annotationProperties.forEach((subproperty) => {
     let { key, validateFunc } = subproperty;
-    if (properties.hasOwnProperty(key) && validateFunc(properties[key])) annotations[key] = properties[key];
+    if (properties.hasOwnProperty(key) && validateFunc(properties[key]))
+      annotations[key] = properties[key];
   });
 
   let body = {
@@ -75,10 +80,18 @@ async function onTrack(event, settings) {
   let response = await res.json();
   let { message, code, error, status = {} } = response;
 
-  if (status.hasOwnProperty('code') && status.code === 200 && status.hasOwnProperty('result') && status.result === 'OK')
+  if (
+    status.hasOwnProperty('code') &&
+    status.code === 200 &&
+    status.hasOwnProperty('result') &&
+    status.result === 'OK'
+  )
     return response;
   else if (code === 400 && !!message) throw new ValidationError(message);
-  else if ((status.hasOwnProperty('result') && status.result === 'ERROR') || !!error)
+  else if (
+    (status.hasOwnProperty('result') && status.result === 'ERROR') ||
+    !!error
+  )
     throw new InvalidEventPayload(message);
   else throw new EventNotSupported('Not sure what is going on');
 }
