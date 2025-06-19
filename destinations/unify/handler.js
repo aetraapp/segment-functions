@@ -79,6 +79,17 @@ async function onPage(event, { writeKey }) {
       }
     }
 
+    // Process campaign parameters if available
+    if (name || source || medium || content || term) {
+      traits.campaign = {
+        name,
+        source,
+        medium,
+        content,
+        term,
+      };
+    }
+
     let response;
 
     try {
@@ -94,13 +105,6 @@ async function onPage(event, { writeKey }) {
           traits: flatten({
             last: {
               ...traits,
-              campaign: {
-                name,
-                source,
-                medium,
-                content,
-                term,
-              },
               ip,
               userAgent,
             },
