@@ -13,7 +13,13 @@ async function onPage(event, { writeKey }) {
     userId,
     anonymousId,
     context: {
-      campaign: { name = '', source = '', medium = '', content = '', term = '' } = {},
+      campaign: {
+        name = '',
+        source = '',
+        medium = '',
+        content = '',
+        term = '',
+      } = {},
       page: { search = undefined } = {},
       ip = undefined,
       userAgent = undefined,
@@ -33,7 +39,9 @@ async function onPage(event, { writeKey }) {
     // Process search parameters if available
     if (search) {
       // Convert all query parameter keys to lowercase
-      const params = new URLSearchParams(search.replace(/[?&]([^=&]+)=/g, (match) => match.toLowerCase()));
+      const params = new URLSearchParams(
+        search.replace(/[?&]([^=&]+)=/g, (match) => match.toLowerCase()),
+      );
 
       // Facebook Ads
       const fbclid = params.get('fbclid');

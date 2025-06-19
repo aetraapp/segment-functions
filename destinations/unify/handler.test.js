@@ -4,7 +4,13 @@ const path = require('path');
 const vm = require('vm');
 
 // Import dependencies from buildpack
-const { ValidationError, RetryError, _, fetch, URLSearchParams } = require('../../buildpack/boreal/window');
+const {
+  ValidationError,
+  RetryError,
+  _,
+  fetch,
+  URLSearchParams,
+} = require('../../buildpack/boreal/window');
 
 // Simulate the buildpack's module loading behavior
 function loadHandler() {
@@ -20,7 +26,10 @@ function loadHandler() {
   });
 
   // Read the handler code
-  const handlerCode = fs.readFileSync(path.join(__dirname, 'handler.js'), 'utf8');
+  const handlerCode = fs.readFileSync(
+    path.join(__dirname, 'handler.js'),
+    'utf8',
+  );
 
   // Wrap the code to capture exports (similar to buildpack)
   const wrappedCode = `
@@ -241,7 +250,8 @@ describe('unify handler', () => {
         context: {
           ...mockEvent.context,
           page: {
-            search: '?fbclid=FB123&gclid=GOOGLE456&msclkid=MS789&utm_source=multi',
+            search:
+              '?fbclid=FB123&gclid=GOOGLE456&msclkid=MS789&utm_source=multi',
           },
         },
       };
@@ -316,8 +326,12 @@ describe('unify handler', () => {
     it('should throw ValidationError when writeKey is missing', async () => {
       const settingsWithoutKey = {};
 
-      await expect(handler.onPage(mockEvent, settingsWithoutKey)).rejects.toThrow(ValidationError);
-      await expect(handler.onPage(mockEvent, settingsWithoutKey)).rejects.toThrow('Write key is required');
+      await expect(
+        handler.onPage(mockEvent, settingsWithoutKey),
+      ).rejects.toThrow(ValidationError);
+      await expect(
+        handler.onPage(mockEvent, settingsWithoutKey),
+      ).rejects.toThrow('Write key is required');
     });
 
     it('should throw ValidationError when timestamp is missing', async () => {
@@ -326,8 +340,12 @@ describe('unify handler', () => {
         timestamp: undefined,
       };
 
-      await expect(handler.onPage(eventWithoutTimestamp, mockSettings)).rejects.toThrow(ValidationError);
-      await expect(handler.onPage(eventWithoutTimestamp, mockSettings)).rejects.toThrow('Timestamp is missing');
+      await expect(
+        handler.onPage(eventWithoutTimestamp, mockSettings),
+      ).rejects.toThrow(ValidationError);
+      await expect(
+        handler.onPage(eventWithoutTimestamp, mockSettings),
+      ).rejects.toThrow('Timestamp is missing');
     });
 
     it('should handle userId being null', async () => {
@@ -371,9 +389,13 @@ describe('unify handler', () => {
     });
 
     it('should throw RetryError on network failure', async () => {
-      nock('https://api.segment.io').post('/v1/identify').replyWithError('Network error');
+      nock('https://api.segment.io')
+        .post('/v1/identify')
+        .replyWithError('Network error');
 
-      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow(RetryError);
+      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow(
+        RetryError,
+      );
     });
 
     it('should throw RetryError on 500 response', async () => {
@@ -381,7 +403,9 @@ describe('unify handler', () => {
         error: 'Internal Server Error',
       });
 
-      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow(RetryError);
+      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow(
+        RetryError,
+      );
     });
 
     it('should throw RetryError on 503 response', async () => {
@@ -389,7 +413,9 @@ describe('unify handler', () => {
         error: 'Service Unavailable',
       });
 
-      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow(RetryError);
+      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow(
+        RetryError,
+      );
     });
 
     it('should throw RetryError on 429 rate limit response', async () => {
@@ -397,13 +423,19 @@ describe('unify handler', () => {
         error: 'Too Many Requests',
       });
 
-      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow(RetryError);
+      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow(
+        RetryError,
+      );
     });
 
     it('should throw RetryError with correct message on network failure', async () => {
-      nock('https://api.segment.io').post('/v1/identify').replyWithError('Network error');
+      nock('https://api.segment.io')
+        .post('/v1/identify')
+        .replyWithError('Network error');
 
-      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow('Network error');
+      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow(
+        'Network error',
+      );
     });
 
     it('should throw RetryError with correct message on 500 response', async () => {
@@ -411,7 +443,9 @@ describe('unify handler', () => {
         error: 'Internal Server Error',
       });
 
-      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow('Failed with 500');
+      await expect(handler.onPage(mockEvent, mockSettings)).rejects.toThrow(
+        'Failed with 500',
+      );
     });
 
     it('should not throw on 4xx errors (except 429)', async () => {
