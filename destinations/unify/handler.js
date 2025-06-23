@@ -1,9 +1,17 @@
 /**
+ * Destination Function: Unify
+ *
+ * This destination receives page views, extracts click Ids and UTM parameters,
+ * and sends identify calls to the Unify profile API.
+ *
+ * Version: 1.0.0 - Initial release
+ */
+
+/**
  * Handle page event
  * @param  {SegmentPageEvent} event
  * @param  {FunctionSettings} settings
  */
-
 async function onPage(event, { writeKey }) {
   if (!writeKey) {
     throw new ValidationError('Write key is required');
@@ -60,17 +68,36 @@ async function onPage(event, { writeKey }) {
         traits.wbraid = wbraid || '';
       }
 
+      // Impact
+      const irclickid = params.get('irclickid');
+      // Impact
+      if (irclickid) {
+        traits.irclickid = irclickid;
+      }
+
+      // LinkedIn Ads
+      const li_fat_id = params.get('li_fat_id');
+      if (li_fat_id) {
+        traits.li_fat_id = li_fat_id;
+      }
+
       // Microsoft Ads
       const msclkid = params.get('msclkid');
       if (msclkid) {
         traits.msclkid = msclkid;
       }
 
-      // Impact
-      const irclickid = params.get('irclickid');
-      // Impact
-      if (irclickid) {
-        traits.irclickid = irclickid;
+      // Pinterest Ads
+      const epik = params.get('epik');
+      if (epik) {
+        traits.epik = epik;
+      }
+
+      // Reddit Ads
+      const rdt_cid = params.get('rdt_cid');
+      if (rdt_cid) {
+        traits.rdt_cid = rdt_cid;
+        traits.rdt_uuid = `${now}.${anonymousId}`;
       }
 
       // Snapchat Ads
@@ -79,11 +106,10 @@ async function onPage(event, { writeKey }) {
         traits.sccid = sccid;
       }
 
-      // Reddit Ads
-      const rdt_cid = params.get('rdt_cid');
-      if (rdt_cid) {
-        traits.rdt_cid = rdt_cid;
-        traits.rdt_uuid = `${now}.${anonymousId}`;
+      // TikTok Ads
+      const ttclid = params.get('ttclid');
+      if (ttclid) {
+        traits.ttclid = ttclid;
       }
     }
 

@@ -199,6 +199,72 @@ describe('unify handler', () => {
       expect(scope.isDone()).toBe(true);
     });
 
+    it('should process LinkedIn Ads fat ID from search parameters', async () => {
+      const eventWithLiFatId = {
+        ...mockEvent,
+        context: {
+          ...mockEvent.context,
+          page: {
+            search: '?li_fat_id=LINKEDIN123',
+          },
+        },
+      };
+
+      const scope = nock('https://api.segment.io')
+        .post('/v1/identify', (body) => {
+          expect(body.traits.lastLiFatId).toBe('LINKEDIN123');
+          return true;
+        })
+        .reply(200, { success: true });
+
+      await handler.onPage(eventWithLiFatId, mockSettings);
+      expect(scope.isDone()).toBe(true);
+    });
+
+    it('should process Pinterest Ads click ID from search parameters', async () => {
+      const eventWithEpik = {
+        ...mockEvent,
+        context: {
+          ...mockEvent.context,
+          page: {
+            search: '?epik=PINTEREST456',
+          },
+        },
+      };
+
+      const scope = nock('https://api.segment.io')
+        .post('/v1/identify', (body) => {
+          expect(body.traits.lastEpik).toBe('PINTEREST456');
+          return true;
+        })
+        .reply(200, { success: true });
+
+      await handler.onPage(eventWithEpik, mockSettings);
+      expect(scope.isDone()).toBe(true);
+    });
+
+    it('should process TikTok Ads click ID from search parameters', async () => {
+      const eventWithTtclid = {
+        ...mockEvent,
+        context: {
+          ...mockEvent.context,
+          page: {
+            search: '?ttclid=TIKTOK789',
+          },
+        },
+      };
+
+      const scope = nock('https://api.segment.io')
+        .post('/v1/identify', (body) => {
+          expect(body.traits.lastTtclid).toBe('TIKTOK789');
+          return true;
+        })
+        .reply(200, { success: true });
+
+      await handler.onPage(eventWithTtclid, mockSettings);
+      expect(scope.isDone()).toBe(true);
+    });
+
     it('should process Snapchat Ads click ID from search parameters', async () => {
       const eventWithSccid = {
         ...mockEvent,
@@ -251,7 +317,7 @@ describe('unify handler', () => {
           ...mockEvent.context,
           page: {
             search:
-              '?fbclid=FB123&gclid=GOOGLE456&msclkid=MS789&utm_source=multi',
+              '?fbclid=FB123&gclid=GOOGLE456&msclkid=MS789&li_fat_id=LI123&epik=PINT456&ttclid=TT789&utm_source=multi',
           },
         },
       };
@@ -264,6 +330,9 @@ describe('unify handler', () => {
           expect(body.traits.lastGbraid).toBe('');
           expect(body.traits.lastWbraid).toBe('');
           expect(body.traits.lastMsclkid).toBe('MS789');
+          expect(body.traits.lastLiFatId).toBe('LI123');
+          expect(body.traits.lastEpik).toBe('PINT456');
+          expect(body.traits.lastTtclid).toBe('TT789');
           return true;
         })
         .reply(200, { success: true });
