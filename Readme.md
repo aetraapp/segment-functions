@@ -8,7 +8,7 @@ as examples to base your own functions upon. If you're building out a new
 integration, or a custom piece of code that you want Segment to run, use
 this repo as the set of examples.
 
-![](https://github.com/segmentio/functions-library/workflows/CI/badge.svg)
+![](https://github.com/aetraapp/segment-functions/workflows/CI/badge.svg)
 
 ## Sources
 
@@ -39,12 +39,15 @@ this repo as the set of examples.
 - [Zendesk](./destinations/zendesk) - Create new Zendesk tickets triggered by events that you send
 - [Datadog](./destinations/datadog) - Sends a metric to datadog with high level message/event type as tags
 - [Optimizely](./destinations/optimizely) - Sends conversion metrix to optimizely.
+- [Unify](./destinations/unify) - Captures campaign attribution and click IDs from page events and updates user profiles via Identify calls
 
 ## Destination Insert Functions
 
 - [Enrich with Company Data](./destination-inserts/enrich-with-company-data) - Enriches identify events with company information based on email domain
 - [PII Filter](./destination-inserts/pii-filter) - Filters out or masks personally identifiable information before sending to destinations
 - [Event Transformer](./destination-inserts/event-transformer) - Transforms events with standardized formatting, derived values, and data enrichment
+- [Aetra](./destination-inserts/aetra) - Enriches Segment events with profile data from the Aetra API
+- [Unify](./destination-inserts/unify) - Enriches events with user profile data from Segment's Profiles API
 
 ## Development
 
