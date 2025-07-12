@@ -54,5 +54,5 @@ this repo as the set of examples.
 Run tests with:
 
 ```
-yarn && yarn test
+pnpm install && pnpm test
 ```
