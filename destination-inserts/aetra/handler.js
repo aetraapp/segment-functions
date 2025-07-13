@@ -18,7 +18,7 @@ async function enrich(event, { writeKey, token }) {
 
   try {
     // Make a POST request to the Aetra enrichment API with the event data
-    response = await fetch(`https://api.aetra.com/profile/${writeKey}/enrich`, {
+    response = await fetch(`https://api.aetra.app/profile/${writeKey}/enrich`, {
       method: 'POST',
       headers: {
         Authorization: `Basic ${btoa(`${token}:`)}`,
