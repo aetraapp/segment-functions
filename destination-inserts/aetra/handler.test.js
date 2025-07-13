@@ -73,7 +73,7 @@ describe('Aetra Enrichment Handler', () => {
   const enrichedEvent = { ...sampleEvent, enriched: true };
 
   it('should enrich track event successfully', async () => {
-    const scope = nock('https://api.aetra.com')
+    const scope = nock('https://api.aetra.app')
       .post(`/profile/${settings.writeKey}/enrich`)
       .matchHeader('authorization', `Basic ${btoa(`${settings.token}:`)}`)
       .matchHeader('x-aetra-version', '2025-01-01')
@@ -86,7 +86,7 @@ describe('Aetra Enrichment Handler', () => {
   });
 
   it('should return original event on network error', async () => {
-    const scope = nock('https://api.aetra.com')
+    const scope = nock('https://api.aetra.app')
       .post(`/profile/${settings.writeKey}/enrich`)
       .replyWithError('Network error');
 
@@ -96,7 +96,7 @@ describe('Aetra Enrichment Handler', () => {
   });
 
   it('should throw RetryError on server error (500)', async () => {
-    const scope = nock('https://api.aetra.com')
+    const scope = nock('https://api.aetra.app')
       .post(`/profile/${settings.writeKey}/enrich`)
       .reply(500, { error: 'Internal Server Error' });
 
@@ -107,7 +107,7 @@ describe('Aetra Enrichment Handler', () => {
   });
 
   it('should throw RetryError on rate limit (429)', async () => {
-    const scope = nock('https://api.aetra.com')
+    const scope = nock('https://api.aetra.app')
       .post(`/profile/${settings.writeKey}/enrich`)
       .reply(429, { error: 'Too Many Requests' });
 
@@ -119,7 +119,7 @@ describe('Aetra Enrichment Handler', () => {
 
   it('should enrich identify event', async () => {
     const identifyEvent = { ...sampleEvent, type: 'identify' };
-    const scope = nock('https://api.aetra.com')
+    const scope = nock('https://api.aetra.app')
       .post(`/profile/${settings.writeKey}/enrich`)
       .reply(200, enrichedEvent);
 
