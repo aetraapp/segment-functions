@@ -365,6 +365,10 @@ describe('unify handler', () => {
     });
 
     it('should not make an API call when campaign data is empty', async () => {
+      const scope = nock('https://api.segment.io')
+        .post('/v1/identify')
+        .reply(200, { success: true });
+
       const eventWithoutCampaign = {
         ...mockEvent,
         context: {
@@ -376,11 +380,17 @@ describe('unify handler', () => {
       // No mock needed as no request should be made
       await handler.onPage(eventWithoutCampaign, mockSettings);
 
-      // Verify no pending mocks
-      expect(nock.pendingMocks()).toHaveLength(0);
+      // Verify pending mocks
+      expect(scope.isDone()).toBe(false);
+      expect(nock.pendingMocks()).toHaveLength(1);
     });
 
     it('should not make an API call when campaign is not present', async () => {
+      const scope = nock('https://api.segment.io')
+        .post('/v1/identify')
+        .reply(200, { success: true });
+
+      // No mock needed as no request should be made
       const eventWithoutCampaign = {
         ...mockEvent,
         context: {},
@@ -388,8 +398,9 @@ describe('unify handler', () => {
 
       await handler.onPage(eventWithoutCampaign, mockSettings);
 
-      // Verify no pending mocks
-      expect(nock.pendingMocks()).toHaveLength(0);
+      // Verify pending mocks
+      expect(scope.isDone()).toBe(false);
+      expect(nock.pendingMocks()).toHaveLength(1);
     });
 
     it('should throw ValidationError when writeKey is missing', async () => {
