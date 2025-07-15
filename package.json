@@ -31,6 +31,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.0.0",
     "jest": "^24.9.0",
+    "lefthook": "^1.12.2",
     "nock": "^11.3.5"
   },
   "engines": {
