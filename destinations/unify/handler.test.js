@@ -56,7 +56,7 @@ describe('unify handler', () => {
   describe('onPage', () => {
     const mockEvent = {
       userId: 'user-123',
-      anonymousId: 'anon-456',
+      anonymousId: '00000000-0000-0000-0000-000000001234',
       context: {
         campaign: {
           name: 'Summer Sale',
@@ -79,13 +79,21 @@ describe('unify handler', () => {
       writeKey: 'test-write-key-123',
     };
 
+    const timestampMs = new Date(mockEvent.timestamp).getTime();
+    const anonIdHex = mockEvent.anonymousId.replace(/-/g, '');
+    const idDecimal = BigInt(`0x${anonIdHex}`).toString();
+    const expectedFbp = `${timestampMs}.${idDecimal}`;
+    const expectedRdtUuid = `${timestampMs}.${mockEvent.anonymousId}`;
+    const expectedIp = mockEvent.context.ip;
+    const expectedUserAgent = mockEvent.context.userAgent;
+
     it('should make an identify call when campaign data is present', async () => {
       // Mock the API call
       const scope = nock('https://api.segment.io')
         .post('/v1/identify', (body) => {
           expect(body.writeKey).toBe('test-write-key-123');
           expect(body.userId).toBe('user-123');
-          expect(body.anonymousId).toBe('anon-456');
+          expect(body.anonymousId).toBe('00000000-0000-0000-0000-000000001234');
           expect(body.traits).toEqual({
             lastCampaignName: 'Summer Sale',
             lastCampaignSource: 'facebook',
@@ -95,6 +103,8 @@ describe('unify handler', () => {
             lastIp: '127.0.0.1',
             lastUserAgent:
               'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            lastFbp: expectedFbp,
+            lastRdtUuid: expectedRdtUuid,
           });
           return true;
         })
@@ -123,6 +133,8 @@ describe('unify handler', () => {
         .post('/v1/identify', (body) => {
           expect(body.traits.lastFbclid).toBe('ABC123XYZ');
           expect(body.traits.lastFbc).toMatch(/^fb\.1\.\d+\.ABC123XYZ$/);
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, { success: true });
@@ -147,6 +159,8 @@ describe('unify handler', () => {
           expect(body.traits.lastGclid).toBe('GOOGLE123');
           expect(body.traits.lastGbraid).toBe('GB123');
           expect(body.traits.lastWbraid).toBe('WB123');
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, { success: true });
@@ -169,6 +183,8 @@ describe('unify handler', () => {
       const scope = nock('https://api.segment.io')
         .post('/v1/identify', (body) => {
           expect(body.traits.lastMsclkid).toBe('MS123456');
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, { success: true });
@@ -191,6 +207,8 @@ describe('unify handler', () => {
       const scope = nock('https://api.segment.io')
         .post('/v1/identify', (body) => {
           expect(body.traits.lastIrclickid).toBe('IMPACT789');
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, { success: true });
@@ -213,6 +231,8 @@ describe('unify handler', () => {
       const scope = nock('https://api.segment.io')
         .post('/v1/identify', (body) => {
           expect(body.traits.lastLiFatId).toBe('LINKEDIN123');
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, { success: true });
@@ -235,6 +255,8 @@ describe('unify handler', () => {
       const scope = nock('https://api.segment.io')
         .post('/v1/identify', (body) => {
           expect(body.traits.lastEpik).toBe('PINTEREST456');
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, { success: true });
@@ -257,6 +279,8 @@ describe('unify handler', () => {
       const scope = nock('https://api.segment.io')
         .post('/v1/identify', (body) => {
           expect(body.traits.lastTtclid).toBe('TIKTOK789');
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, { success: true });
@@ -279,6 +303,8 @@ describe('unify handler', () => {
       const scope = nock('https://api.segment.io')
         .post('/v1/identify', (body) => {
           expect(body.traits.lastSccid).toBe('SNAP456');
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, { success: true });
@@ -301,7 +327,8 @@ describe('unify handler', () => {
       const scope = nock('https://api.segment.io')
         .post('/v1/identify', (body) => {
           expect(body.traits.lastRdtCid).toBe('REDDIT123');
-          expect(body.traits.lastRdtUuid).toMatch(/^\d+\.anon-456$/);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
+          expect(body.traits.lastFbp).toBe(expectedFbp);
           return true;
         })
         .reply(200, { success: true });
@@ -333,6 +360,8 @@ describe('unify handler', () => {
           expect(body.traits.lastLiFatId).toBe('LI123');
           expect(body.traits.lastEpik).toBe('PINT456');
           expect(body.traits.lastTtclid).toBe('TT789');
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, { success: true });
@@ -356,6 +385,8 @@ describe('unify handler', () => {
         .post('/v1/identify', (body) => {
           expect(body.traits.lastFbclid).toBe('FB_UPPER');
           expect(body.traits.lastGclid).toBe('GOOGLE_MIXED');
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, { success: true });
@@ -364,16 +395,26 @@ describe('unify handler', () => {
       expect(scope.isDone()).toBe(true);
     });
 
-    it('should not make an API call when campaign data is empty', async () => {
+    it('should make an API call when campaign data is empty', async () => {
       const scope = nock('https://api.segment.io')
-        .post('/v1/identify')
+        .post('/v1/identify', (body) => {
+          expect(body.traits).toEqual({
+            lastIp: expectedIp,
+            lastUserAgent: expectedUserAgent,
+            lastFbp: expectedFbp,
+            lastRdtUuid: expectedRdtUuid,
+          });
+          return true;
+        })
         .reply(200, { success: true });
 
+      // For empty campaign test
       const eventWithoutCampaign = {
         ...mockEvent,
         context: {
+          ...mockEvent.context,
           campaign: {},
-          page: {},
+          page: { search: undefined },
         },
       };
 
@@ -381,13 +422,18 @@ describe('unify handler', () => {
       await handler.onPage(eventWithoutCampaign, mockSettings);
 
       // Verify pending mocks
-      expect(scope.isDone()).toBe(false);
-      expect(nock.pendingMocks()).toHaveLength(1);
+      expect(scope.isDone()).toBe(true);
     });
 
-    it('should not make an API call when campaign is not present', async () => {
+    it('should make an API call when campaign is not present', async () => {
       const scope = nock('https://api.segment.io')
-        .post('/v1/identify')
+        .post('/v1/identify', (body) => {
+          expect(body.traits).toEqual({
+            lastFbp: expectedFbp,
+            lastRdtUuid: expectedRdtUuid,
+          });
+          return true;
+        })
         .reply(200, { success: true });
 
       // No mock needed as no request should be made
@@ -399,8 +445,7 @@ describe('unify handler', () => {
       await handler.onPage(eventWithoutCampaign, mockSettings);
 
       // Verify pending mocks
-      expect(scope.isDone()).toBe(false);
-      expect(nock.pendingMocks()).toHaveLength(1);
+      expect(scope.isDone()).toBe(true);
     });
 
     it('should throw ValidationError when writeKey is missing', async () => {
@@ -437,7 +482,9 @@ describe('unify handler', () => {
       const scope = nock('https://api.segment.io')
         .post('/v1/identify', (body) => {
           expect(body.userId).toBe(null);
-          expect(body.anonymousId).toBe('anon-456');
+          expect(body.anonymousId).toBe('00000000-0000-0000-0000-000000001234');
+          expect(body.traits.lastFbp).toBe(expectedFbp);
+          expect(body.traits.lastRdtUuid).toBe(expectedRdtUuid);
           return true;
         })
         .reply(200, {
@@ -458,6 +505,8 @@ describe('unify handler', () => {
         .post('/v1/identify', (body) => {
           expect(body.userId).toBe('user-123');
           expect(body.anonymousId).toBe(null);
+          expect(body.traits).not.toHaveProperty('lastFbp');
+          expect(body.traits).not.toHaveProperty('lastRdtUuid');
           return true;
         })
         .reply(200, {
@@ -541,6 +590,7 @@ describe('unify handler', () => {
       const eventWithCampaign = {
         ...mockEvent,
         context: {
+          ...mockEvent.context,
           campaign: {
             name: 'Test Campaign',
             source: 'google',
@@ -559,6 +609,10 @@ describe('unify handler', () => {
             lastCampaignMedium: 'cpc',
             lastCampaignContent: 'text-ad',
             lastCampaignTerm: 'keywords',
+            lastIp: expectedIp,
+            lastUserAgent: expectedUserAgent,
+            lastFbp: expectedFbp,
+            lastRdtUuid: expectedRdtUuid,
           });
           return true;
         })
@@ -572,6 +626,7 @@ describe('unify handler', () => {
       const eventWithEmptyValues = {
         ...mockEvent,
         context: {
+          ...mockEvent.context,
           campaign: {
             name: 'Test Campaign',
             source: '',
@@ -590,6 +645,10 @@ describe('unify handler', () => {
             lastCampaignMedium: 'cpc',
             lastCampaignContent: '',
             lastCampaignTerm: '',
+            lastIp: expectedIp,
+            lastUserAgent: expectedUserAgent,
+            lastFbp: expectedFbp,
+            lastRdtUuid: expectedRdtUuid,
           });
           return true;
         })
