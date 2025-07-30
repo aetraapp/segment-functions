@@ -4,6 +4,7 @@
  * This function enriches events with data from the Unify profile API.
  *
  * Version: 1.0.0 - Initial release
+ * Version: 1.0.1 - Add Google Ads destination bug workaround
  */
 
 /**
@@ -11,7 +12,7 @@
  * @param  {SegmentTrackEvent | SegmentIdentifyEvent | SegmentGroupEvent | SegmentPageEvent | SegmentScreenEvent} event
  * @param  {FunctionSettings} settings
  */
-async function enrich(event, { spaceId, spaceToken }) {
+async function lookup(event, { spaceId, spaceToken, googleAds }) {
   if (!spaceId || !spaceToken) {
     throw new ValidationError('Space ID and Space Token are required');
   }
@@ -204,6 +205,24 @@ async function enrich(event, { spaceId, spaceToken }) {
     }
   }
 
+  // If this is the Google Ads destination, work around a bug in the Segment
+  // destination. Prefer properties in order gclid, gbraid, and wbraid. Remove
+  // email and phone when gbraid or wbraid exist.
+  // https://github.com/segmentio/action-destinations/pull/2940
+  if (googleAds) {
+    if (properties.gclid) {
+      properties.gbraid = undefined;
+      properties.wbraid = undefined;
+    } else if (properties.gbraid) {
+      properties.wbraid = undefined;
+      traits.email = undefined;
+      traits.phone = undefined;
+    } else {
+      traits.email = undefined;
+      traits.phone = undefined;
+    }
+  }
+
   event.context = {
     ...event.context,
     ...context,
@@ -214,8 +233,8 @@ async function enrich(event, { spaceId, spaceToken }) {
     ...properties,
   };
 
-  //   console.log({ context, traits, properties });
-  //   console.log(event);
+  // console.log({ context, traits, properties });
+  // console.log(event);
 
   return event;
 }
@@ -223,9 +242,9 @@ async function enrich(event, { spaceId, spaceToken }) {
 /**
  * Enrich events
  */
-onPage = (event, settings) => enrich(event, settings);
-onTrack = (event, settings) => enrich(event, settings);
-onScreen = (event, settings) => enrich(event, settings);
+onPage = (event, settings) => lookup(event, settings);
+onTrack = (event, settings) => lookup(event, settings);
+onScreen = (event, settings) => lookup(event, settings);
 
 onIdentify = () => {
   throw new EventNotSupported('identify is not supported');

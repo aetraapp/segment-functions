@@ -688,6 +688,303 @@ describe('unify event enrichment handler', () => {
     });
   });
 
+  describe('Google Ads destination logic', () => {
+    const mockSettingsWithGoogleAds = {
+      ...mockSettings,
+      googleAds: true,
+    };
+
+    it('should prioritize gclid and remove gbraid/wbraid when gclid exists', async () => {
+      const profileWithAllGoogleIds = {
+        ...mockProfileTraits,
+        lastCampaignGclid: 'CjwKCAjw_gclid_123',
+        lastCampaignGbraid: 'GB_should_be_removed',
+        lastCampaignWbraid: 'WB_should_be_removed',
+      };
+
+      const scope = nock('https://profiles.segment.com')
+        .get(
+          '/v1/spaces/test-space-123/collections/users/profiles/user_id:user-123/traits',
+        )
+        .query(true)
+        .reply(200, {
+          traits: profileWithAllGoogleIds,
+        });
+
+      const result = await handler.onTrack(
+        mockEvent,
+        mockSettingsWithGoogleAds,
+      );
+
+      expect(scope.isDone()).toBe(true);
+      expect(result.properties.gclid).toBe('CjwKCAjw_gclid_123');
+      expect(result.properties.gbraid).toBeUndefined();
+      expect(result.properties.wbraid).toBeUndefined();
+      // Email and phone should remain when gclid exists
+      expect(result.context.traits.email).toBe('user@example.com');
+      expect(result.context.traits.phone).toBe('+1234567890');
+    });
+
+    it('should prioritize gbraid and remove wbraid/email/phone when gbraid exists but gclid does not', async () => {
+      const profileWithGbraidOnly = {
+        ...mockProfileTraits,
+        lastCampaignGclid: undefined,
+        lastCampaignGbraid: 'GB_priority_123',
+        lastCampaignWbraid: 'WB_should_be_removed',
+      };
+
+      const scope = nock('https://profiles.segment.com')
+        .get(
+          '/v1/spaces/test-space-123/collections/users/profiles/user_id:user-123/traits',
+        )
+        .query(true)
+        .reply(200, {
+          traits: profileWithGbraidOnly,
+        });
+
+      const result = await handler.onTrack(
+        mockEvent,
+        mockSettingsWithGoogleAds,
+      );
+
+      expect(scope.isDone()).toBe(true);
+      expect(result.properties.gclid).toBeUndefined();
+      expect(result.properties.gbraid).toBe('GB_priority_123');
+      expect(result.properties.wbraid).toBeUndefined();
+      // Email and phone should be removed when gbraid exists
+      expect(result.context.traits.email).toBeUndefined();
+      expect(result.context.traits.phone).toBeUndefined();
+      // Other traits should remain
+      expect(result.context.traits.firstName).toBe('John');
+      expect(result.context.traits.lastName).toBe('Doe');
+    });
+
+    it('should remove email/phone when only wbraid exists', async () => {
+      const profileWithWbraidOnly = {
+        ...mockProfileTraits,
+        lastCampaignGclid: undefined,
+        lastCampaignGbraid: undefined,
+        lastCampaignWbraid: 'WB_only_123',
+      };
+
+      const scope = nock('https://profiles.segment.com')
+        .get(
+          '/v1/spaces/test-space-123/collections/users/profiles/user_id:user-123/traits',
+        )
+        .query(true)
+        .reply(200, {
+          traits: profileWithWbraidOnly,
+        });
+
+      const result = await handler.onTrack(
+        mockEvent,
+        mockSettingsWithGoogleAds,
+      );
+
+      expect(scope.isDone()).toBe(true);
+      expect(result.properties.gclid).toBeUndefined();
+      expect(result.properties.gbraid).toBeUndefined();
+      expect(result.properties.wbraid).toBe('WB_only_123');
+      // Email and phone should be removed when only wbraid exists
+      expect(result.context.traits.email).toBeUndefined();
+      expect(result.context.traits.phone).toBeUndefined();
+      // Other traits should remain
+      expect(result.context.traits.firstName).toBe('John');
+      expect(result.context.traits.lastName).toBe('Doe');
+    });
+
+    it('should remove email/phone when no Google click IDs exist', async () => {
+      const profileWithoutGoogleIds = {
+        ...mockProfileTraits,
+        lastCampaignGclid: undefined,
+        lastCampaignGbraid: undefined,
+        lastCampaignWbraid: undefined,
+      };
+
+      const scope = nock('https://profiles.segment.com')
+        .get(
+          '/v1/spaces/test-space-123/collections/users/profiles/user_id:user-123/traits',
+        )
+        .query(true)
+        .reply(200, {
+          traits: profileWithoutGoogleIds,
+        });
+
+      const result = await handler.onTrack(
+        mockEvent,
+        mockSettingsWithGoogleAds,
+      );
+
+      expect(scope.isDone()).toBe(true);
+      expect(result.properties.gclid).toBeUndefined();
+      expect(result.properties.gbraid).toBeUndefined();
+      expect(result.properties.wbraid).toBeUndefined();
+      // Email and phone should be removed when no Google IDs exist
+      expect(result.context.traits.email).toBeUndefined();
+      expect(result.context.traits.phone).toBeUndefined();
+      // Other traits should remain
+      expect(result.context.traits.firstName).toBe('John');
+      expect(result.context.traits.lastName).toBe('Doe');
+    });
+
+    it('should not apply Google Ads logic when googleAds setting is false', async () => {
+      const profileWithAllGoogleIds = {
+        ...mockProfileTraits,
+        lastCampaignGclid: 'CjwKCAjw_gclid_123',
+        lastCampaignGbraid: 'GB_should_remain',
+        lastCampaignWbraid: 'WB_should_remain',
+      };
+
+      const scope = nock('https://profiles.segment.com')
+        .get(
+          '/v1/spaces/test-space-123/collections/users/profiles/user_id:user-123/traits',
+        )
+        .query(true)
+        .reply(200, {
+          traits: profileWithAllGoogleIds,
+        });
+
+      // Use regular settings without googleAds flag
+      const result = await handler.onTrack(mockEvent, mockSettings);
+
+      expect(scope.isDone()).toBe(true);
+      expect(result.properties.gclid).toBe('CjwKCAjw_gclid_123');
+      expect(result.properties.gbraid).toBe('GB_should_remain');
+      expect(result.properties.wbraid).toBe('WB_should_remain');
+      // Email and phone should remain when googleAds setting is false
+      expect(result.context.traits.email).toBe('user@example.com');
+      expect(result.context.traits.phone).toBe('+1234567890');
+    });
+
+    it('should not apply Google Ads logic when googleAds setting is undefined', async () => {
+      const profileWithAllGoogleIds = {
+        ...mockProfileTraits,
+        lastCampaignGclid: 'CjwKCAjw_gclid_123',
+        lastCampaignGbraid: 'GB_should_remain',
+        lastCampaignWbraid: 'WB_should_remain',
+      };
+
+      const settingsWithoutGoogleAds = {
+        spaceId: 'test-space-123',
+        spaceToken: 'test-token-xyz',
+        // googleAds is undefined
+      };
+
+      const scope = nock('https://profiles.segment.com')
+        .get(
+          '/v1/spaces/test-space-123/collections/users/profiles/user_id:user-123/traits',
+        )
+        .query(true)
+        .reply(200, {
+          traits: profileWithAllGoogleIds,
+        });
+
+      const result = await handler.onTrack(mockEvent, settingsWithoutGoogleAds);
+
+      expect(scope.isDone()).toBe(true);
+      expect(result.properties.gclid).toBe('CjwKCAjw_gclid_123');
+      expect(result.properties.gbraid).toBe('GB_should_remain');
+      expect(result.properties.wbraid).toBe('WB_should_remain');
+      // Email and phone should remain when googleAds setting is undefined
+      expect(result.context.traits.email).toBe('user@example.com');
+      expect(result.context.traits.phone).toBe('+1234567890');
+    });
+
+    it('should work with page events and URL parameter extraction combined with Google Ads logic', async () => {
+      const pageEventWithGclid = {
+        type: 'page',
+        name: 'Landing',
+        userId: 'user-123',
+        anonymousId: 'anon-456',
+        properties: {
+          path: '/landing',
+        },
+        context: {
+          ip: '192.168.1.100',
+          userAgent: 'Mozilla/5.0',
+          page: {
+            search: '?gclid=URL_GCLID_123&gbraid=URL_GBRAID_456',
+          },
+        },
+        timestamp: '2024-01-15T10:30:00Z',
+      };
+
+      const profileWithoutGoogleIds = {
+        ...mockProfileTraits,
+        lastCampaignGclid: undefined,
+        lastCampaignGbraid: undefined,
+        lastCampaignWbraid: undefined,
+      };
+
+      const scope = nock('https://profiles.segment.com')
+        .get(
+          '/v1/spaces/test-space-123/collections/users/profiles/user_id:user-123/traits',
+        )
+        .query(true)
+        .reply(200, {
+          traits: profileWithoutGoogleIds,
+        });
+
+      const result = await handler.onPage(
+        pageEventWithGclid,
+        mockSettingsWithGoogleAds,
+      );
+
+      expect(scope.isDone()).toBe(true);
+      // URL parameters should be extracted first
+      expect(result.properties.gclid).toBe('URL_GCLID_123');
+      // Then Google Ads logic should remove gbraid since gclid exists
+      expect(result.properties.gbraid).toBeUndefined();
+      // Email and phone should remain since gclid exists
+      expect(result.context.traits.email).toBe('user@example.com');
+      expect(result.context.traits.phone).toBe('+1234567890');
+    });
+
+    it('should apply Google Ads logic to screen events', async () => {
+      const screenEvent = {
+        type: 'screen',
+        name: 'Product Screen',
+        userId: 'user-123',
+        anonymousId: 'anon-456',
+        properties: {
+          screenClass: 'ProductViewController',
+        },
+        context: {
+          ip: '192.168.1.100',
+          userAgent: 'MobileApp/1.0',
+        },
+        timestamp: '2024-01-15T10:30:00Z',
+      };
+
+      const profileWithGbraidOnly = {
+        ...mockProfileTraits,
+        lastCampaignGclid: undefined,
+        lastCampaignGbraid: 'GB_mobile_123',
+        lastCampaignWbraid: undefined,
+      };
+
+      const scope = nock('https://profiles.segment.com')
+        .get(
+          '/v1/spaces/test-space-123/collections/users/profiles/user_id:user-123/traits',
+        )
+        .query(true)
+        .reply(200, {
+          traits: profileWithGbraidOnly,
+        });
+
+      const result = await handler.onScreen(
+        screenEvent,
+        mockSettingsWithGoogleAds,
+      );
+
+      expect(scope.isDone()).toBe(true);
+      expect(result.properties.gbraid).toBe('GB_mobile_123');
+      // Email and phone should be removed for screen events with gbraid
+      expect(result.context.traits.email).toBeUndefined();
+      expect(result.context.traits.phone).toBeUndefined();
+    });
+  });
+
   describe('edge cases', () => {
     it('should handle empty profile traits', async () => {
       const scope = nock('https://profiles.segment.com')
