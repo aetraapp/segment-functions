@@ -5,6 +5,7 @@
  *
  * Version: 1.0.0 - Initial release
  * Version: 1.0.1 - Add Google Ads destination bug workaround
+ * Version: 1.0.2 - Remove 'Campaign' from traits
  */
 
 /**
@@ -42,19 +43,19 @@ async function lookup(event, { spaceId, spaceToken, googleAds }) {
     'lastCampaignMedium',
     'lastCampaignContent',
     'lastCampaignTerm',
-    'lastCampaignFbclid', // Facebook Ads
-    'lastCampaignFbc', // Facebook Ads
-    'lastCampaignGclid', // Google Ads
-    'lastCampaignGbraid', // Google Ads
-    'lastCampaignWbraid', // Google Ads
-    'lastCampaignIrclickid', // Impact
-    'lastCampaignLiFatId', // LinkedIn Ads
-    'lastCampaignMsclkid', // Microsoft Ads
-    'lastCampaignEpik', // Pinterest Ads
-    'lastCampaignRdtCid', // Reddit Ads
-    'lastCampaignRdtUuid', // Reddit Ads
-    'lastCampaignSccid', // Snapchat Ads
-    'lastCampaignTtclid', // TikTok Ads
+    'lastFbclid', // Facebook Ads
+    'lastFbc', // Facebook Ads
+    'lastGclid', // Google Ads
+    'lastGbraid', // Google Ads
+    'lastWbraid', // Google Ads
+    'lastIrclickid', // Impact
+    'lastLiFatId', // LinkedIn Ads
+    'lastMsclkid', // Microsoft Ads
+    'lastEpik', // Pinterest Ads
+    'lastRdtCid', // Reddit Ads
+    'lastRdtUuid', // Reddit Ads
+    'lastSccid', // Snapchat Ads
+    'lastTtclid', // TikTok Ads
     'lastIp',
     'lastUserAgent',
     'email',
@@ -114,18 +115,18 @@ async function lookup(event, { spaceId, spaceToken, googleAds }) {
   };
 
   const properties = {
-    fbc: profile.lastCampaignFbc, // Facebook Ads
-    gclid: profile.lastCampaignGclid, // Google Ads
-    gbraid: profile.lastCampaignGbraid, // Google Ads
-    wbraid: profile.lastCampaignWbraid, // Google Ads
-    irclickid: profile.lastCampaignIrclickid, // Impact
-    li_fat_id: profile.lastCampaignLiFatId, // LinkedIn Ads
-    msclkid: profile.lastCampaignMsclkid, // Microsoft Ads
-    epik: profile.lastCampaignEpik, // Pinterest Ads
-    rdt_cid: profile.lastCampaignRdtCid, // Reddit Ads
-    rdt_uuid: profile.lastCampaignRdtUuid, // Reddit Ads
-    sccid: profile.lastCampaignSccid, // Snapchat Ads
-    ttclid: profile.lastCampaignTtclid, // TikTok Ads
+    fbc: profile.lastFbc, // Facebook Ads
+    gclid: profile.lastGclid, // Google Ads
+    gbraid: profile.lastGbraid, // Google Ads
+    wbraid: profile.lastWbraid, // Google Ads
+    irclickid: profile.lastIrclickid, // Impact
+    li_fat_id: profile.lastLiFatId, // LinkedIn Ads
+    msclkid: profile.lastMsclkid, // Microsoft Ads
+    epik: profile.lastEpik, // Pinterest Ads
+    rdt_cid: profile.lastRdtCid, // Reddit Ads
+    rdt_uuid: profile.lastRdtUuid, // Reddit Ads
+    sccid: profile.lastSccid, // Snapchat Ads
+    ttclid: profile.lastTtclid, // TikTok Ads
   };
 
   const context = {

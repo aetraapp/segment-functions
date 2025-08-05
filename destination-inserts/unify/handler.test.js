@@ -106,19 +106,19 @@ describe('unify event enrichment handler', () => {
     lastCampaignMedium: 'social',
     lastCampaignContent: 'banner',
     lastCampaignTerm: 'discount',
-    lastCampaignFbclid: 'FB123XYZ',
-    lastCampaignFbc: 'fb.1.1704067200000.FB123XYZ',
-    lastCampaignGclid: 'CjwKCAjw...',
-    lastCampaignGbraid: 'GB123',
-    lastCampaignWbraid: 'WB123',
-    lastCampaignMsclkid: 'MS456',
-    lastCampaignIrclickid: 'IR789',
-    lastCampaignLiFatId: 'LI123',
-    lastCampaignEpik: 'dj0123456789',
-    lastCampaignRdtCid: 'RDT345',
-    lastCampaignRdtUuid: '1704067200000.anon-456',
-    lastCampaignSccid: 'SC012',
-    lastCampaignTtclid: 'TT567',
+    lastFbclid: 'FB123XYZ',
+    lastFbc: 'fb.1.1704067200000.FB123XYZ',
+    lastGclid: 'CjwKCAjw...',
+    lastGbraid: 'GB123',
+    lastWbraid: 'WB123',
+    lastMsclkid: 'MS456',
+    lastIrclickid: 'IR789',
+    lastLiFatId: 'LI123',
+    lastEpik: 'dj0123456789',
+    lastRdtCid: 'RDT345',
+    lastRdtUuid: '1704067200000.anon-456',
+    lastSccid: 'SC012',
+    lastTtclid: 'TT567',
     lastIp: '192.168.1.50',
     lastUserAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
   };
@@ -133,7 +133,7 @@ describe('unify event enrichment handler', () => {
         .query({
           limit: 100,
           include:
-            'lastCampaignName,lastCampaignSource,lastCampaignMedium,lastCampaignContent,lastCampaignTerm,lastCampaignFbclid,lastCampaignFbc,lastCampaignGclid,lastCampaignGbraid,lastCampaignWbraid,lastCampaignIrclickid,lastCampaignLiFatId,lastCampaignMsclkid,lastCampaignEpik,lastCampaignRdtCid,lastCampaignRdtUuid,lastCampaignSccid,lastCampaignTtclid,lastIp,lastUserAgent,email,phone,firstName,lastName,address,gender,birthday',
+            'lastCampaignName,lastCampaignSource,lastCampaignMedium,lastCampaignContent,lastCampaignTerm,lastFbclid,lastFbc,lastGclid,lastGbraid,lastWbraid,lastIrclickid,lastLiFatId,lastMsclkid,lastEpik,lastRdtCid,lastRdtUuid,lastSccid,lastTtclid,lastIp,lastUserAgent,email,phone,firstName,lastName,address,gender,birthday',
         })
         .matchHeader('authorization', `Basic ${btoa('test-token-xyz:')}`)
         .reply(200, {
@@ -281,12 +281,12 @@ describe('unify event enrichment handler', () => {
         .reply(200, {
           traits: {
             ...mockProfileTraits,
-            lastCampaignGclid: 'GCLID123',
-            lastCampaignGbraid: 'GBRAID456',
-            lastCampaignWbraid: 'WBRAID789',
-            lastCampaignLiFatId: 'LIFAT123',
-            lastCampaignEpik: 'EPIK456',
-            lastCampaignTtclid: 'TTCLID789',
+            lastGclid: 'GCLID123',
+            lastGbraid: 'GBRAID456',
+            lastWbraid: 'WBRAID789',
+            lastLiFatId: 'LIFAT123',
+            lastEpik: 'EPIK456',
+            lastTtclid: 'TTCLID789',
           },
         });
 
@@ -458,7 +458,7 @@ describe('unify event enrichment handler', () => {
     it('should generate fbc when fbclid is present and fbc is not in profile', async () => {
       const profileWithoutFbc = {
         ...mockProfileTraits,
-        lastCampaignFbc: undefined,
+        lastFbc: undefined,
       };
 
       const scope = nock('https://profiles.segment.com')
@@ -490,17 +490,17 @@ describe('unify event enrichment handler', () => {
 
       const profileWithoutParams = {
         ...mockProfileTraits,
-        lastCampaignFbc: undefined,
-        lastCampaignGclid: undefined,
-        lastCampaignGbraid: undefined,
-        lastCampaignWbraid: undefined,
-        lastCampaignIrclickid: undefined,
-        lastCampaignLiFatId: undefined,
-        lastCampaignMsclkid: undefined,
-        lastCampaignEpik: undefined,
-        lastCampaignRdtCid: undefined,
-        lastCampaignSccid: undefined,
-        lastCampaignTtclid: undefined,
+        lastFbc: undefined,
+        lastGclid: undefined,
+        lastGbraid: undefined,
+        lastWbraid: undefined,
+        lastIrclickid: undefined,
+        lastLiFatId: undefined,
+        lastMsclkid: undefined,
+        lastEpik: undefined,
+        lastRdtCid: undefined,
+        lastSccid: undefined,
+        lastTtclid: undefined,
       };
 
       const scope = nock('https://profiles.segment.com')
@@ -697,9 +697,9 @@ describe('unify event enrichment handler', () => {
     it('should prioritize gclid and remove gbraid/wbraid when gclid exists', async () => {
       const profileWithAllGoogleIds = {
         ...mockProfileTraits,
-        lastCampaignGclid: 'CjwKCAjw_gclid_123',
-        lastCampaignGbraid: 'GB_should_be_removed',
-        lastCampaignWbraid: 'WB_should_be_removed',
+        lastGclid: 'CjwKCAjw_gclid_123',
+        lastGbraid: 'GB_should_be_removed',
+        lastWbraid: 'WB_should_be_removed',
       };
 
       const scope = nock('https://profiles.segment.com')
@@ -728,9 +728,9 @@ describe('unify event enrichment handler', () => {
     it('should prioritize gbraid and remove wbraid/email/phone when gbraid exists but gclid does not', async () => {
       const profileWithGbraidOnly = {
         ...mockProfileTraits,
-        lastCampaignGclid: undefined,
-        lastCampaignGbraid: 'GB_priority_123',
-        lastCampaignWbraid: 'WB_should_be_removed',
+        lastGclid: undefined,
+        lastGbraid: 'GB_priority_123',
+        lastWbraid: 'WB_should_be_removed',
       };
 
       const scope = nock('https://profiles.segment.com')
@@ -762,9 +762,9 @@ describe('unify event enrichment handler', () => {
     it('should remove email/phone when only wbraid exists', async () => {
       const profileWithWbraidOnly = {
         ...mockProfileTraits,
-        lastCampaignGclid: undefined,
-        lastCampaignGbraid: undefined,
-        lastCampaignWbraid: 'WB_only_123',
+        lastGclid: undefined,
+        lastGbraid: undefined,
+        lastWbraid: 'WB_only_123',
       };
 
       const scope = nock('https://profiles.segment.com')
@@ -796,9 +796,9 @@ describe('unify event enrichment handler', () => {
     it('should remove email/phone when no Google click IDs exist', async () => {
       const profileWithoutGoogleIds = {
         ...mockProfileTraits,
-        lastCampaignGclid: undefined,
-        lastCampaignGbraid: undefined,
-        lastCampaignWbraid: undefined,
+        lastGclid: undefined,
+        lastGbraid: undefined,
+        lastWbraid: undefined,
       };
 
       const scope = nock('https://profiles.segment.com')
@@ -830,9 +830,9 @@ describe('unify event enrichment handler', () => {
     it('should not apply Google Ads logic when googleAds setting is false', async () => {
       const profileWithAllGoogleIds = {
         ...mockProfileTraits,
-        lastCampaignGclid: 'CjwKCAjw_gclid_123',
-        lastCampaignGbraid: 'GB_should_remain',
-        lastCampaignWbraid: 'WB_should_remain',
+        lastGclid: 'CjwKCAjw_gclid_123',
+        lastGbraid: 'GB_should_remain',
+        lastWbraid: 'WB_should_remain',
       };
 
       const scope = nock('https://profiles.segment.com')
@@ -859,9 +859,9 @@ describe('unify event enrichment handler', () => {
     it('should not apply Google Ads logic when googleAds setting is undefined', async () => {
       const profileWithAllGoogleIds = {
         ...mockProfileTraits,
-        lastCampaignGclid: 'CjwKCAjw_gclid_123',
-        lastCampaignGbraid: 'GB_should_remain',
-        lastCampaignWbraid: 'WB_should_remain',
+        lastGclid: 'CjwKCAjw_gclid_123',
+        lastGbraid: 'GB_should_remain',
+        lastWbraid: 'WB_should_remain',
       };
 
       const settingsWithoutGoogleAds = {
@@ -911,9 +911,9 @@ describe('unify event enrichment handler', () => {
 
       const profileWithoutGoogleIds = {
         ...mockProfileTraits,
-        lastCampaignGclid: undefined,
-        lastCampaignGbraid: undefined,
-        lastCampaignWbraid: undefined,
+        lastGclid: undefined,
+        lastGbraid: undefined,
+        lastWbraid: undefined,
       };
 
       const scope = nock('https://profiles.segment.com')
@@ -958,9 +958,9 @@ describe('unify event enrichment handler', () => {
 
       const profileWithGbraidOnly = {
         ...mockProfileTraits,
-        lastCampaignGclid: undefined,
-        lastCampaignGbraid: 'GB_mobile_123',
-        lastCampaignWbraid: undefined,
+        lastGclid: undefined,
+        lastGbraid: 'GB_mobile_123',
+        lastWbraid: undefined,
       };
 
       const scope = nock('https://profiles.segment.com')
@@ -1082,8 +1082,8 @@ describe('unify event enrichment handler', () => {
 
       const profileWithoutRdt = {
         ...mockProfileTraits,
-        lastCampaignRdtCid: undefined,
-        lastCampaignRdtUuid: undefined,
+        lastRdtCid: undefined,
+        lastRdtUuid: undefined,
       };
 
       const scope = nock('https://profiles.segment.com')
@@ -1170,8 +1170,8 @@ describe('unify event enrichment handler', () => {
         .query(true)
         .reply(200, {
           traits: {
-            lastCampaignGclid: 'PROFILE_GCLID',
-            lastCampaignLiFatId: 'PROFILE_LIFAT',
+            lastGclid: 'PROFILE_GCLID',
+            lastLiFatId: 'PROFILE_LIFAT',
           },
         });
 
