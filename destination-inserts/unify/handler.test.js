@@ -133,7 +133,7 @@ describe('unify event enrichment handler', () => {
         .query({
           limit: 100,
           include:
-            'lastCampaignName,lastCampaignSource,lastCampaignMedium,lastCampaignContent,lastCampaignTerm,lastFbclid,lastFbc,lastGclid,lastGbraid,lastWbraid,lastIrclickid,lastLiFatId,lastMsclkid,lastEpik,lastRdtCid,lastRdtUuid,lastSccid,lastTtclid,lastIp,lastUserAgent,email,phone,firstName,lastName,address,gender,birthday',
+            'lastCampaignName,lastCampaignSource,lastCampaignMedium,lastCampaignContent,lastCampaignTerm,lastFbclid,lastFbc,lastFbp,lastGclid,lastGbraid,lastWbraid,lastIrclickid,lastLiFatId,lastMsclkid,lastEpik,lastRdtCid,lastRdtUuid,lastSccid,lastTtclid,lastIp,lastUserAgent,email,phone,firstName,lastName,address,gender,birthday',
         })
         .matchHeader('authorization', `Basic ${btoa('test-token-xyz:')}`)
         .reply(200, {
@@ -205,21 +205,29 @@ describe('unify event enrichment handler', () => {
       expect(scope.isDone()).toBe(true);
     });
 
-    it('should return event unchanged when profile not found', async () => {
+    it('should throw RetryError when profile not found', async () => {
       const scope = nock('https://profiles.segment.com')
         .get(
           '/v1/spaces/test-space-123/collections/users/profiles/user_id:user-123/traits',
         )
-        .query(true)
+        .query({
+          limit: 100,
+          include:
+            'lastCampaignName,lastCampaignSource,lastCampaignMedium,lastCampaignContent,lastCampaignTerm,lastFbclid,lastFbc,lastFbp,lastGclid,lastGbraid,lastWbraid,lastIrclickid,lastLiFatId,lastMsclkid,lastEpik,lastRdtCid,lastRdtUuid,lastSccid,lastTtclid,lastIp,lastUserAgent,email,phone,firstName,lastName,address,gender,birthday',
+        })
+        .times(2)
         .reply(404, {
           error: 'Profile not found',
         });
 
-      const result = await handler.onTrack(mockEvent, mockSettings);
+      await expect(handler.onTrack(mockEvent, mockSettings)).rejects.toThrow(
+        RetryError,
+      );
+      await expect(handler.onTrack(mockEvent, mockSettings)).rejects.toThrow(
+        'Retrying… Profile not found…',
+      );
 
       expect(scope.isDone()).toBe(true);
-      // Event should be unchanged
-      expect(result).toEqual(mockEvent);
     });
 
     it('should use lastIp when current IP is not present', async () => {

@@ -6,6 +6,8 @@
  * Version: 1.0.0 - Initial release
  * Version: 1.0.1 - Add Google Ads destination bug workaround
  * Version: 1.0.2 - Remove 'Campaign' from traits
+ * Version: 1.0.3 - Add fbp to properties
+ * Version: 1.0.4 - Add retry for profile not found
  */
 
 /**
@@ -45,6 +47,7 @@ async function lookup(event, { spaceId, spaceToken, googleAds }) {
     'lastCampaignTerm',
     'lastFbclid', // Facebook Ads
     'lastFbc', // Facebook Ads
+    'lastFbp', // Facebook Ads
     'lastGclid', // Google Ads
     'lastGbraid', // Google Ads
     'lastWbraid', // Google Ads
@@ -81,9 +84,10 @@ async function lookup(event, { spaceId, spaceToken, googleAds }) {
     throw new RetryError(error.message);
   }
 
-  // Profile not found return the event as-is
+  // Profile not found retry
+  // Every user should have a profile when using the Unify destination function
   if (response.status === 404) {
-    return event;
+    throw new RetryError(`Retrying… Profile not found…`);
   }
 
   // Retry on errors
@@ -116,6 +120,7 @@ async function lookup(event, { spaceId, spaceToken, googleAds }) {
 
   const properties = {
     fbc: profile.lastFbc, // Facebook Ads
+    fbp: profile.lastFbp, // Facebook Ads
     gclid: profile.lastGclid, // Google Ads
     gbraid: profile.lastGbraid, // Google Ads
     wbraid: profile.lastWbraid, // Google Ads
@@ -234,8 +239,8 @@ async function lookup(event, { spaceId, spaceToken, googleAds }) {
     ...properties,
   };
 
-  // console.log({ context, traits, properties });
-  // console.log(event);
+  console.log({ context, traits, properties });
+  console.log(event);
 
   return event;
 }
