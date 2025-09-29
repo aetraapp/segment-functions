@@ -36,7 +36,7 @@ sendConversion = async (
 
   const hashedEmailAddress = hash(event.context?.traits?.email ?? '');
   const hashedPhoneNumber = hash(event.context?.traits?.phone ?? '');
-  const microsoftClickId = event.context?.traits?.lastCampaignMsclkid ?? '';
+  const microsoftClickId = event.properties?.msclkid ?? '';
 
   let conversionName;
   let conversionValue = 0;
