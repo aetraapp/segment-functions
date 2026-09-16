@@ -1,5 +1,5 @@
 /**
- * Aetra Event Enrichment
+ * Aetra Event Enrichment — v1.0.1
  *
  * This function sends the event to the Aetra API for enrichment and returns the enriched event.
  * If the writeKey or token is missing, it returns the original event.
@@ -7,18 +7,27 @@
  * If the API returns a server error or rate limit, it throws a RetryError for Segment to retry.
  *
  * @param {SegmentTrackEvent | SegmentIdentifyEvent | SegmentGroupEvent | SegmentPageEvent | SegmentScreenEvent} event - The Segment event to enrich
- * @param {FunctionSettings} settings - The function settings containing writeKey and token
+ * @param {FunctionSettings} settings - The function settings containing writeKey, token, and optional label
  * @returns {Promise<object>} The enriched event
  */
-async function enrich(event, { writeKey, token }) {
+async function enrich(event, { writeKey, token, label }) {
   if (!writeKey || !token) {
     return event;
   }
+
+  const sanitizedLabel = label
+    ? label.toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 32)
+    : '';
+
+  const url = sanitizedLabel
+    ? `https://api.aetra.app/profile/${writeKey}/enrich/${sanitizedLabel}`
+    : `https://api.aetra.app/profile/${writeKey}/enrich`;
+
   let response;
 
   try {
     // Make a POST request to the Aetra enrichment API with the event data
-    response = await fetch(`https://api.aetra.app/profile/${writeKey}/enrich`, {
+    response = await fetch(url, {
       method: 'POST',
       headers: {
         Authorization: `Basic ${btoa(`${token}:`)}`,

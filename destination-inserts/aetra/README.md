@@ -4,7 +4,7 @@
 
 This Insert Function enriches Segment events with profile data from the Aetra API. It is designed to enhance events by fetching additional information based on the event data.
 
-**Version:** 1.0.0 - Initial release
+**Version:** 1.0.1 - Add optional label setting for enrich URL
 
 ## Setup
 
@@ -13,13 +13,14 @@ To use this function in Segment:
 1. Create a new Insert Function in your Segment workspace.
 2. Copy and paste the code from `handler.js` into the function editor.
 3. Configure the following settings:
-   - `writeKey`: Your Aetra Space write key (required).
-   - `token`: Your Aetra Space API token for authentication (required).
+   - `writeKey`: Your Aetra Space write key (required)
+   - `token`: Your Aetra Space API token for authentication (required)
+   - `label`: Optional label appended to the enrich URL (e.g. `google`, `meta`, `tiktok`). Displayed in the event stream so it must be lowercase alphanumeric (max 32 chars).
 
 ## How It Works
 
 The function defines an `enrich` method that:
-- Sends a POST request to `https://api.aetra.com/profile/{writeKey}/enrich` with the event data.
+- Sends a POST request to `https://api.aetra.app/profile/{writeKey}/enrich` (or `.../enrich/{label}` when a label is configured) with the event data.
 - Uses Basic Authentication with the provided `token`.
 - Specifies the API version via the `X-Aetra-Version` header (set to '2025-01-01').
 
@@ -54,6 +55,7 @@ To test the function:
 
 - `writeKey` (string) 
 - `token` (string) 
+- `label` (string) — optional, e.g. `google`, `meta`, `reddit`, `tiktok`, `impact`
 
 
 For more details, refer to the comments in `handler.js`.

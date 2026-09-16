@@ -154,4 +154,42 @@ describe('Aetra Enrichment Handler', () => {
     const result = await handler.onTrack(sampleEvent, invalidSettings);
     expect(result).toEqual(sampleEvent);
   });
+
+  it('should append a sanitized label to the enrich URL', async () => {
+    const labeledSettings = { ...settings, label: 'google' };
+    const scope = nock('https://api.aetra.app')
+      .post(`/profile/${settings.writeKey}/enrich/google`)
+      .reply(200, enrichedEvent);
+
+    const result = await handler.onTrack(sampleEvent, labeledSettings);
+    expect(result).toEqual(enrichedEvent);
+    expect(scope.isDone()).toBe(true);
+  });
+
+  it('should lowercase the label, strip spaces and special characters, and truncate to 32 chars', async () => {
+    const labeledSettings = {
+      ...settings,
+      label: 'Google Ads / Meta!! this-label-is-way-too-long-for-the-stream',
+    };
+    const scope = nock('https://api.aetra.app')
+      .post(
+        `/profile/${settings.writeKey}/enrich/googleadsmetathis-label-is-way-t`,
+      )
+      .reply(200, enrichedEvent);
+
+    const result = await handler.onTrack(sampleEvent, labeledSettings);
+    expect(result).toEqual(enrichedEvent);
+    expect(scope.isDone()).toBe(true);
+  });
+
+  it('should omit the label from the URL when it sanitizes to empty', async () => {
+    const labeledSettings = { ...settings, label: '!!!' };
+    const scope = nock('https://api.aetra.app')
+      .post(`/profile/${settings.writeKey}/enrich`)
+      .reply(200, enrichedEvent);
+
+    const result = await handler.onTrack(sampleEvent, labeledSettings);
+    expect(result).toEqual(enrichedEvent);
+    expect(scope.isDone()).toBe(true);
+  });
 });
